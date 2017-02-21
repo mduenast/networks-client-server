@@ -9,6 +9,7 @@
 
 int parse_args(int argc, char** argv, Configuration* configuration, Arguments* arguments) {
     int i;
+    strcpy(arguments->arxiu_configuracio,"client.cfg");
     for (i = 0; i < argc; i++) {
         if (strcmp(argv[i], "-c") == 0) {
             strcpy(arguments->arxiu_configuracio, argv[i + 1]);
@@ -40,11 +41,9 @@ char* get_sub_str(char* str,int inici,int fi){
 
 int set_opcions_condiguracio(char opcio_configuracio[100],Configuration* configuracio) {
     if (strstr(opcio_configuracio, "Name") != NULL) {
-        char cad[100];
         strcpy(configuracio->name,get_sub_str(opcio_configuracio,7,strlen(opcio_configuracio)));
         printf("%s\n",configuracio->name);
     } else if (strstr(opcio_configuracio, "Situation") != NULL) {
-        char cad[100];
         strcpy(configuracio->situation,get_sub_str(opcio_configuracio,12,strlen(opcio_configuracio)));
         printf("%s\n",configuracio->situation);
     } else if (strstr(opcio_configuracio, "Elements") != NULL) {
@@ -52,21 +51,16 @@ int set_opcions_condiguracio(char opcio_configuracio[100],Configuration* configu
         strcpy(cad,get_sub_str(opcio_configuracio,11,strlen(opcio_configuracio)));
         printf("%s\n",cad);
     } else if (strstr(opcio_configuracio, "MAC") != NULL) {
-        char cad[100];
         strcpy(configuracio->mac,get_sub_str(opcio_configuracio,6,strlen(opcio_configuracio)));
         printf("%s\n",configuracio->mac);
     } else if (strstr(opcio_configuracio, "Local-TCP") != NULL) {
-        char tcp[10];
-        strcpy(tcp,get_sub_str(opcio_configuracio,12,strlen(opcio_configuracio)));
-        configuracio->local_tcp = atoi(tcp);
+        configuracio->local_tcp = atoi(get_sub_str(opcio_configuracio,12,strlen(opcio_configuracio)));
         printf("%i\n",configuracio->local_tcp);
     } else if (strstr(opcio_configuracio, "Server") != NULL) {
         strcpy(configuracio->server,get_sub_str(opcio_configuracio,9,strlen(opcio_configuracio)));
         printf("%s\n",configuracio->server);
     } else if (strstr(opcio_configuracio, "Srv-UDP") != NULL) {
-        char udp[10];
-        strcpy(udp,get_sub_str(opcio_configuracio,10,strlen(opcio_configuracio)));
-        configuracio->srv_udp = atoi(udp);
+        configuracio->srv_udp = atoi(get_sub_str(opcio_configuracio,10,strlen(opcio_configuracio)));
         printf("%i\n",configuracio->srv_udp);
     }
     return 0;
