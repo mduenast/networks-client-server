@@ -35,9 +35,9 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/arg_parser.o \
+	${OBJECTDIR}/arguments_impl.o \
 	${OBJECTDIR}/client.o \
-	${OBJECTDIR}/fase_registre.o
+	${OBJECTDIR}/subscripcio_impl.o
 
 
 # C Compiler Flags
@@ -64,20 +64,20 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/client: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.c} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/client ${OBJECTFILES} ${LDLIBSOPTIONS}
 
-${OBJECTDIR}/arg_parser.o: arg_parser.c
+${OBJECTDIR}/arguments_impl.o: arguments_impl.c
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.c) -g -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/arg_parser.o arg_parser.c
+	$(COMPILE.c) -g -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/arguments_impl.o arguments_impl.c
 
 ${OBJECTDIR}/client.o: client.c
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.c) -g -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/client.o client.c
 
-${OBJECTDIR}/fase_registre.o: fase_registre.c
+${OBJECTDIR}/subscripcio_impl.o: subscripcio_impl.c
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.c) -g -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/fase_registre.o fase_registre.c
+	$(COMPILE.c) -g -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/subscripcio_impl.o subscripcio_impl.c
 
 # Subprojects
 .build-subprojects:

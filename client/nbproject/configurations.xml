@@ -4,13 +4,9 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
-      <itemPath>arg_parser_H.h</itemPath>
       <itemPath>arguments.h</itemPath>
-      <itemPath>configuration.h</itemPath>
-      <itemPath>estats_fase_registre.h</itemPath>
-      <itemPath>pdu.h</itemPath>
-      <itemPath>temporitzadors_fase_registre.h</itemPath>
-      <itemPath>tipus_paquets_fase_registre.h</itemPath>
+      <itemPath>estat_client.h</itemPath>
+      <itemPath>subscripcio.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -19,9 +15,9 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>arg_parser.c</itemPath>
+      <itemPath>arguments_impl.c</itemPath>
       <itemPath>client.c</itemPath>
-      <itemPath>fase_registre.c</itemPath>
+      <itemPath>subscripcio_impl.c</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="Test Files"
@@ -49,25 +45,17 @@
           <commandLine>-ansi -pedantic -Wall</commandLine>
         </cTool>
       </compileType>
-      <item path="arg_parser.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="arg_parser_H.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="arguments.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="arguments_impl.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="client.c" ex="false" tool="0" flavor2="0">
       </item>
-      <item path="configuration.h" ex="false" tool="3" flavor2="0">
+      <item path="estat_client.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="estats_fase_registre.h" ex="false" tool="3" flavor2="0">
+      <item path="subscripcio.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="fase_registre.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="pdu.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="temporitzadors_fase_registre.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="tipus_paquets_fase_registre.h" ex="false" tool="3" flavor2="0">
+      <item path="subscripcio_impl.c" ex="false" tool="0" flavor2="0">
       </item>
     </conf>
     <conf name="Release" type="1">
@@ -91,25 +79,17 @@
           <developmentMode>5</developmentMode>
         </asmTool>
       </compileType>
-      <item path="arg_parser.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="arg_parser_H.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="arguments.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="arguments_impl.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="client.c" ex="false" tool="0" flavor2="0">
       </item>
-      <item path="configuration.h" ex="false" tool="3" flavor2="0">
+      <item path="estat_client.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="estats_fase_registre.h" ex="false" tool="3" flavor2="0">
+      <item path="subscripcio.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="fase_registre.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="pdu.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="temporitzadors_fase_registre.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="tipus_paquets_fase_registre.h" ex="false" tool="3" flavor2="0">
+      <item path="subscripcio_impl.c" ex="false" tool="0" flavor2="0">
       </item>
     </conf>
   </confs>
