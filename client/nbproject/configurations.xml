@@ -6,6 +6,7 @@
                    projectFiles="true">
       <itemPath>arguments.h</itemPath>
       <itemPath>estat_client.h</itemPath>
+      <itemPath>socket.h</itemPath>
       <itemPath>subscripcio.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
@@ -53,6 +54,8 @@
       </item>
       <item path="estat_client.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="socket.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="subscripcio.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="subscripcio_impl.c" ex="false" tool="0" flavor2="0">
@@ -86,6 +89,8 @@
       <item path="client.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="estat_client.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="socket.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="subscripcio.h" ex="false" tool="3" flavor2="0">
       </item>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 naluem
+ * Copyright (C) 2017 mdt3
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +18,31 @@
 #include "arguments.h"
 #include "estat_client.h"
 #include "subscripcio.h"
+#include "socket.h"
 
 int subscripcio(Estat* estat_client, Configuracio* configuracio) {
     estat_client->estat = DISCONNECTED;
-    
+
+    Socket* socket = (Socket*) malloc(sizeof (Socket));
+    if ((socket->he = gethostbyname(configuracio->server)) == NULL) {
+        /* llamada a gethostbyname() */
+        fprintf(stderr, "gethostbyname() error\n");
+        return -1;
+    }
+
+    if ((socket->fd = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
+        /* llamada a socket() */
+        fprintf(stderr, "socket() error\n");
+        return -1;
+    }
+
+    socket->server.sin_family = AF_INET;
+    socket->server.sin_port = htons(configuracio->srv_udp);
+    struct hostent* he = socket->he;
+    (socket->server).sin_addr = *((struct in_addr *) he->h_addr );
+    bzero(&(configuracio->server.sin_zero), 8);
+
+
+
     return 0;
 }

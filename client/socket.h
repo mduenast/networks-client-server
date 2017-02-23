@@ -15,13 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ESTAT_CLIENT_H
-#define ESTAT_CLIENT_H 
+#ifndef SOCKET_H
+#define SOCKET_H
 
-typedef struct estat_client {
-    int estat;
-} Estat;
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h>    
 
+typedef struct socket {
+    int fd;
+    struct hostent *he;
+    struct sockaddr_in server;
+} Socket;
 
-#endif /* ESTAT_CLIENT_H */
+#endif /* SOCKET_H */
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 naluem
+ * Copyright (C) 2017 mdt3
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,12 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* 
- * File:   subscripcio.h
- * Author: naluem
- *
- * Created on 23 de febrero de 2017, 21:55
- */
 #include "estat_client.h"
 #include "arguments.h"
 
