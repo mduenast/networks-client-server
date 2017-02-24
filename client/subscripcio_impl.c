@@ -21,6 +21,9 @@
 #include "socket_client.h"
 #include "stdlib.h"
 #include "unistd.h"
+#include <sys/select.h>
+#include <sys/time.h>
+#include <sys/types.h>
 
 int subscripcio(Estat* estat_client, Configuracio* configuracio) {
     estat_client->estat = DISCONNECTED;
@@ -29,6 +32,26 @@ int subscripcio(Estat* estat_client, Configuracio* configuracio) {
     if (start_socket(socket_client, configuracio) == -1) {
         return -1;
     }
+    
+    // prepara el paquet
+    PDU* pdu = (PDU*) malloc(sizeof (PDU));
+    char dades[80];
+    sprintf(dades, "%s,%s", configuracio->name, configuracio->situation);
+    prepara_pdu(pdu, SUBS_REQ, configuracio, "00000000", dades);
+    // envia el paquet
+    envia(estat_client, socket_client, pdu);
+    estat_client->estat = WAIT_ACK_SUBS;
+    printf("El client passa al estat WAIT_ACK_SUBS\n");
+    
+    fd_set read_set;
+    FD_ZERO(&read_set);
+    FD_SET(socket_client->fd, &read_set);
+    struct timeval time_out;
+    time_out.tv_sec = 5;
+    int result = select(socket_client->fd + 1, &read_set, NULL, NULL, &time_out);
+    
+    
+    /*
     // prepara el paquet
     PDU* pdu = (PDU*) malloc(sizeof (PDU));
     char dades[80];
@@ -45,6 +68,7 @@ int subscripcio(Estat* estat_client, Configuracio* configuracio) {
     rep_resposta(estat_client, configuracio, socket_client, pdu);
     //envia(socket_client, pdu);
     //}
+     */
     return 0;
 }
 
@@ -100,7 +124,7 @@ void comprova_resposta(Estat* estat_client, Configuracio* configuracio, Socket_c
         strcpy(configuracio->dades_servidor.mac, pdu->mac);
         strcpy(configuracio->dades_servidor.numero_aleatori, pdu->numero_aleatori);
         configuracio->dades_servidor.udp_port = atoi(pdu->dades);
-        
+
         char dades[80];
         memset(dades, 0, sizeof (dades));
         sprintf(dades, "%i,", configuracio->local_tcp);
