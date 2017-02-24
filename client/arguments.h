@@ -30,6 +30,10 @@ typedef struct element {
     char codi[7 + 1];
 } Element;
 
+typedef struct dades_servidor{
+    
+}Dades_servidor;
+
 typedef struct configuracio {
     char name[8 + 1];
     char situation[20];
@@ -38,6 +42,7 @@ typedef struct configuracio {
     int local_tcp;
     char server[20];
     int srv_udp;
+    Dades_servidor dades_servidor;
 } Configuracio;
 
 void init_arguments(Arguments* arguments);

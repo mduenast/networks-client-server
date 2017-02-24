@@ -35,13 +35,13 @@ int subscripcio(Estat* estat_client, Configuracio* configuracio) {
     sprintf(dades, "%s,%s", configuracio->name, configuracio->situation);
     prepara_pdu(pdu, SUBS_REQ, configuracio, "00000000", dades);
     // envia el paquet
-    envia(socket_client, pdu);
+    envia(estat_client, socket_client, pdu);
     estat_client->estat = WAIT_ACK_SUBS;
     printf("El client passa al estat WAIT_ACK_SUBS\n");
     //int i;
     //for(i=1;i<N;i++){
-        comprova_resposta(socket_client,pdu);
-        //envia(socket_client, pdu);
+    rep_resposta(estat_client, socket_client, pdu);
+    //envia(socket_client, pdu);
     //}
     return 0;
 }
@@ -71,7 +71,7 @@ void prepara_pdu(PDU* pdu, unsigned char tipus_paquet, Configuracio* configuraci
     strcpy(pdu->dades, dades);
 }
 
-void envia(Socket_client* socket_client, PDU* pdu) {
+void envia(Estat* estat_client, Socket_client* socket_client, PDU* pdu) {
     int bytes = sendto(socket_client->fd, pdu, sizeof (PDU), 0,
             (struct sockaddr*) &(socket_client->server), sizeof (struct sockaddr));
     if (bytes == -1) {
@@ -81,12 +81,34 @@ void envia(Socket_client* socket_client, PDU* pdu) {
             pdu->tipus_paquet, pdu->mac, pdu->numero_aleatori, pdu->dades);
 }
 
-void comprova_resposta(Socket_client* socket_client,PDU* pdu){
-    socklen_t socklen = sizeof(struct sockaddr);
-    int bytes = recvfrom(socket_client->fd,pdu,sizeof(PDU),0,(struct sockaddr*)&(socket_client->server),&socklen);
+void rep_resposta(Estat* estat_client, Socket_client* socket_client, PDU* pdu) {
+    socklen_t socklen = sizeof (struct sockaddr);
+    int bytes = recvfrom(socket_client->fd, pdu, sizeof (PDU), 0, (struct sockaddr*) &(socket_client->server), &socklen);
     if (bytes == -1) {
         fprintf(stderr, "recvfrom() error\n");
     }
+    comprova_resposta(estat_client, socket_client, pdu);
     printf("Rep => tipus paquet : %c , mac : %s , numero aleatori : %s , dades : %s\n",
             pdu->tipus_paquet, pdu->mac, pdu->numero_aleatori, pdu->dades);
+}
+
+void comprova_resposta(Estat* estat_client, Socket_client* socket_client, PDU* pdu) {
+    if (pdu->tipus_paquet == SUBS_ACK && estat_client->estat == WAIT_ACK_SUBS) {
+        printf("SUBS_ACK rebut !!!\n");
+    } else if (pdu->tipus_paquet == SUBS_NACK || pdu->tipus_paquet == SUBS_REJ) {
+        estat_client->estat = NOT_SUBSCRIBED;
+        printf("El client passa a estat NOT_SUBSCRIBED\n");
+    } else if (pdu->tipus_paquet == INFO_ACK && estat_client->estat == WAIT_ACK_INFO) {
+        printf("INFO_ACK rebut !!!\n");
+        estat_client->estat = SUBSCRIBED;
+        printf("El client passa a estat SUBSCRIBED\n");
+    }else{
+        estat_client->estat = NOT_SUBSCRIBED;
+        printf("El client passa a estat NOT_SUBSCRIBED\n");
+    }
+}
+
+int comprova_dades(Estat* estat_client,Socket_client* socket_client,PDU* pdu){
+    
+    return 0;
 }
