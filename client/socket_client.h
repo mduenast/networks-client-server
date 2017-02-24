@@ -19,16 +19,24 @@
 #define SOCKET_H
 
 #include <stdio.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h>    
+#include <stdlib.h>
+#include <unistd.h>
+#include <errno.h>
+#include <time.h>
+#include <string.h>
 
-typedef struct socket {
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <unistd.h>  
+
+typedef struct socket_client {
     int fd;
     struct hostent *he;
     struct sockaddr_in server;
-} Socket;
+} Socket_client;
 
 #endif /* SOCKET_H */
 

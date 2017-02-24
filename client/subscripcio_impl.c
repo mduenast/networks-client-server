@@ -18,31 +18,50 @@
 #include "arguments.h"
 #include "estat_client.h"
 #include "subscripcio.h"
-#include "socket.h"
+#include "socket_client.h"
+#include "stdlib.h"
+#include "unistd.h"
 
 int subscripcio(Estat* estat_client, Configuracio* configuracio) {
-    estat_client->estat = DISCONNECTED;
-
-    Socket* socket = (Socket*) malloc(sizeof (Socket));
-    if ((socket->he = gethostbyname(configuracio->server)) == NULL) {
-        /* llamada a gethostbyname() */
-        fprintf(stderr, "gethostbyname() error\n");
+    estat_client->estat = DISCONNECTED;    
+    Socket_client* socket_client = (Socket_client*) malloc(sizeof(Socket_client));
+    if(start_socket(socket_client,configuracio) == -1){
         return -1;
     }
-
-    if ((socket->fd = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
-        /* llamada a socket() */
-        fprintf(stderr, "socket() error\n");
-        return -1;
-    }
-
-    socket->server.sin_family = AF_INET;
-    socket->server.sin_port = htons(configuracio->srv_udp);
-    struct hostent* he = socket->he;
-    (socket->server).sin_addr = *((struct in_addr *) he->h_addr );
-    bzero(&(configuracio->server.sin_zero), 8);
-
-
-
+    estat_client->estat = WAIT_ACK_SUBS;
+    PDU* pdu = (PDU*) malloc(sizeof(PDU));
+    pdu->tipus_paquet = SUBS_REQ;
+    strcpy(pdu->mac,configuracio->mac);
+    strcpy(pdu->numero_aleatori,"00000000");
+    sprintf(pdu->dades,"%s,%s",configuracio->name,configuracio->situation);
+    //while(1){
+        int bytes = sendto(socket_client->fd,pdu,sizeof(PDU),0,
+                (struct sockaddr*)&(socket_client->server),sizeof(struct sockaddr));
+        printf("Envia %li bytes \nTipus paquet : %c , mac : %s , numero aleatori : %s , dades : %s\n",
+                sizeof(pdu),pdu->tipus_paquet,pdu->mac,pdu->numero_aleatori,pdu->dades);
+        if(bytes == -1){
+            fprintf(stderr,"sendto() error\n");
+        }
+        estat_client->estat = WAIT_ACK_SUBS;
+    //}
     return 0;
 }
+
+int start_socket(Socket_client* socket_client,Configuracio* configuracio){
+    socket_client->he = gethostbyname(configuracio->server);
+    if(socket_client->he == NULL){
+        fprintf(stderr,"gethostbyname() error\n");
+        return -1;
+    }
+    socket_client->fd = socket(AF_INET,SOCK_DGRAM,0);
+    if(socket_client->fd == -1){
+        fprintf(stderr,"socket() error\n");
+        return -1;
+    }
+    socket_client->server.sin_family = AF_INET;
+    socket_client->server.sin_port = htons(configuracio->srv_udp);
+    socket_client->server.sin_addr = *((struct in_addr*)socket_client->he->h_addr_list[0]);
+    memset(&(socket_client->server.sin_zero),0,sizeof(socket_client->server.sin_zero));
+    return 0;
+}
+

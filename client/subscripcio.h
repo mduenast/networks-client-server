@@ -17,6 +17,7 @@
 
 #include "estat_client.h"
 #include "arguments.h"
+#include "socket_client.h"
 
 #ifndef SUBSCRIPCIO_H
 #define SUBSCRIPCIO_H 
@@ -62,6 +63,7 @@ typedef struct pdu {
 #define P (int) 3
 #define Q (int) 4
 
+int start_socket(Socket_client* socket_client,Configuracio* configuracio);
 int subscripcio(Estat* estat_client, Configuracio* configuracio);
 
 #endif /* SUBSCRIPCIO_H */
