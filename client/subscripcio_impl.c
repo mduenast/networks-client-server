@@ -54,18 +54,21 @@ int subscripcio(Estat* estat_client, Configuracio* configuracio) {
     for (j = 0; j < O; j++) {
         for (i = 1; i < P; i++) {
             time_out.tv_sec = T;
+            envia(estat_client,socket_client,pdu);
             result = select(socket_client->fd + 1, &read_set, NULL, NULL, &time_out);
             asynchronous_read(estat_client,socket_client,configuracio,pdu,&read_set,result);
             paquets++;
         }
         for (i = 2; i < Q; i++) {
             time_out.tv_sec = T * i;
+            envia(estat_client,socket_client,pdu);
             result = select(socket_client->fd + 1, &read_set, NULL, NULL, &time_out);
             asynchronous_read(estat_client,socket_client,configuracio,pdu,&read_set,result);
             paquets++;
         }
         time_out.tv_sec = Q * T;
         while (paquets <= N) {
+            envia(estat_client,socket_client,pdu);
             result = select(socket_client->fd + 1, &read_set, NULL, NULL, &time_out);
             asynchronous_read(estat_client,socket_client,configuracio,pdu,&read_set,result);
             paquets++;
@@ -201,8 +204,5 @@ void asynchronous_read(Estat* estat_client,Socket_client* socket_client,Configur
         //}
     } else if (result < 0) {
         fprintf(stderr,"Error al select() \n");
-    }
-    else{
-        envia(estat_client,socket_client,pdu);
     }
 }
