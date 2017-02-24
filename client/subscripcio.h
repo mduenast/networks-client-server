@@ -65,6 +65,9 @@ typedef struct pdu {
 
 int start_socket(Socket_client* socket_client,Configuracio* configuracio);
 int subscripcio(Estat* estat_client, Configuracio* configuracio);
+void prepara_pdu(PDU* pdu,unsigned char tipus_paquet,Configuracio* configuracio,char* numero_aleatori,char* dades);
+void envia(Socket_client* socket_client,PDU* pdu);
+void comprova_resposta(Socket_client* socket_client,PDU* pdu);
 
 #endif /* SUBSCRIPCIO_H */
 
