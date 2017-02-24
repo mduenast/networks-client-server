@@ -40,22 +40,9 @@ int subscripcio(Estat* estat_client, Configuracio* configuracio) {
     printf("El client passa al estat WAIT_ACK_SUBS\n");
     //int i;
     //for(i=1;i<N;i++){
-    
-    rep_resposta(estat_client,configuracio, socket_client, pdu);
-    memset(dades,0,sizeof(dades));
-    sprintf(dades,"%i,",configuracio->local_tcp);
-    int i;
-    for(i=0;i<(sizeof(configuracio->elements)/sizeof(Element));i++){
-        strcat(dades,configuracio->elements[i].codi);
-        if(i + 1 < (sizeof(configuracio->elements)/sizeof(Element))){
-            strcat(dades,";");
-            printf("pene");
-        }
-    }
-    prepara_pdu(pdu, SUBS_INFO, configuracio, configuracio->dades_servidor.numero_aleatori, dades);
-    socket_client->server.sin_port = htons(configuracio->dades_servidor.udp_port);
-    envia(estat_client,socket_client,pdu);
-    rep_resposta(estat_client,configuracio, socket_client, pdu);
+
+    rep_resposta(estat_client, configuracio, socket_client, pdu);
+    rep_resposta(estat_client, configuracio, socket_client, pdu);
     //envia(socket_client, pdu);
     //}
     return 0;
@@ -96,50 +83,63 @@ void envia(Estat* estat_client, Socket_client* socket_client, PDU* pdu) {
             pdu->tipus_paquet, pdu->mac, pdu->numero_aleatori, pdu->dades);
 }
 
-void rep_resposta(Estat* estat_client,Configuracio* configuracio, Socket_client* socket_client, PDU* pdu) {
+void rep_resposta(Estat* estat_client, Configuracio* configuracio, Socket_client* socket_client, PDU* pdu) {
     socklen_t socklen = sizeof (struct sockaddr);
     int bytes = recvfrom(socket_client->fd, pdu, sizeof (PDU), 0, (struct sockaddr*) &(socket_client->server), &socklen);
     if (bytes == -1) {
         fprintf(stderr, "recvfrom() error\n");
     }
-    comprova_resposta(estat_client,configuracio, socket_client, pdu);
+    comprova_resposta(estat_client, configuracio, socket_client, pdu);
     printf("Rep => tipus paquet : %c , mac : %s , numero aleatori : %s , dades : %s\n",
             pdu->tipus_paquet, pdu->mac, pdu->numero_aleatori, pdu->dades);
 }
 
-void comprova_resposta(Estat* estat_client,Configuracio* configuracio, Socket_client* socket_client, PDU* pdu) {
+void comprova_resposta(Estat* estat_client, Configuracio* configuracio, Socket_client* socket_client, PDU* pdu) {
     if (pdu->tipus_paquet == SUBS_ACK && estat_client->estat == WAIT_ACK_SUBS) {
-        strcpy(configuracio->dades_servidor.ip,inet_ntoa(socket_client->server.sin_addr));
-        strcpy(configuracio->dades_servidor.mac,pdu->mac);
-        strcpy(configuracio->dades_servidor.numero_aleatori,pdu->numero_aleatori);
+        strcpy(configuracio->dades_servidor.ip, inet_ntoa(socket_client->server.sin_addr));
+        strcpy(configuracio->dades_servidor.mac, pdu->mac);
+        strcpy(configuracio->dades_servidor.numero_aleatori, pdu->numero_aleatori);
         configuracio->dades_servidor.udp_port = atoi(pdu->dades);
+        
+        char dades[80];
+        memset(dades, 0, sizeof (dades));
+        sprintf(dades, "%i,", configuracio->local_tcp);
+        int i;
+        for (i = 0; i < (sizeof (configuracio->elements) / sizeof (Element)); i++) {
+            strcat(dades, configuracio->elements[i].codi);
+            if (i + 1 < (sizeof (configuracio->elements) / sizeof (Element))) {
+                strcat(dades, ";");
+            }
+        }
+        prepara_pdu(pdu, SUBS_INFO, configuracio, configuracio->dades_servidor.numero_aleatori, dades);
+        socket_client->server.sin_port = htons(configuracio->dades_servidor.udp_port);
+        envia(estat_client, socket_client, pdu);
         estat_client->estat = WAIT_ACK_INFO;
     } else if (pdu->tipus_paquet == SUBS_NACK || pdu->tipus_paquet == SUBS_REJ) {
         estat_client->estat = NOT_SUBSCRIBED;
         printf("El client passa a estat NOT_SUBSCRIBED\n");
     } else if (pdu->tipus_paquet == INFO_ACK && estat_client->estat == WAIT_ACK_INFO) {
-        if(comprova_dades(estat_client,configuracio,socket_client,pdu) == 0){
+        if (comprova_dades(estat_client, configuracio, socket_client, pdu) == 0) {
             estat_client->estat = SUBSCRIBED;
             printf("El client passa a estat SUBSCRIBED\n");
-        }
-        else{
+        } else {
             estat_client->estat = NOT_SUBSCRIBED;
             printf("El client passa a estat NOT_SUBSCRIBED\n");
         }
-    }else{
+    } else {
         estat_client->estat = NOT_SUBSCRIBED;
-        printf("---El client passa a estat NOT_SUBSCRIBED\n");
+        printf("El client passa a estat NOT_SUBSCRIBED\n");
     }
 }
 
-int comprova_dades(Estat* estat_client,Configuracio* configuracio,Socket_client* socket_client,PDU* pdu){
-    if(strcmp(configuracio->dades_servidor.ip,inet_ntoa(socket_client->server.sin_addr)) != 0){
+int comprova_dades(Estat* estat_client, Configuracio* configuracio, Socket_client* socket_client, PDU* pdu) {
+    if (strcmp(configuracio->dades_servidor.ip, inet_ntoa(socket_client->server.sin_addr)) != 0) {
         return -1;
     }
-    if(strcmp(configuracio->dades_servidor.mac,pdu->mac) != 0){
+    if (strcmp(configuracio->dades_servidor.mac, pdu->mac) != 0) {
         return -1;
     }
-    if(strcmp(configuracio->dades_servidor.numero_aleatori,pdu->numero_aleatori) != 0){
+    if (strcmp(configuracio->dades_servidor.numero_aleatori, pdu->numero_aleatori) != 0) {
         return -1;
     }
     return 0;
