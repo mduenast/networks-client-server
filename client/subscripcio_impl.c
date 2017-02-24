@@ -32,7 +32,7 @@ int subscripcio(Estat* estat_client, Configuracio* configuracio) {
     if (start_socket(socket_client, configuracio) == -1) {
         return -1;
     }
-    
+
     // prepara el paquet
     PDU* pdu = (PDU*) malloc(sizeof (PDU));
     char dades[80];
@@ -42,15 +42,39 @@ int subscripcio(Estat* estat_client, Configuracio* configuracio) {
     envia(estat_client, socket_client, pdu);
     estat_client->estat = WAIT_ACK_SUBS;
     printf("El client passa al estat WAIT_ACK_SUBS\n");
-    
+
     fd_set read_set;
     FD_ZERO(&read_set);
     FD_SET(socket_client->fd, &read_set);
     struct timeval time_out;
-    time_out.tv_sec = 5;
+    time_out.tv_sec = T;
     int result = select(socket_client->fd + 1, &read_set, NULL, NULL, &time_out);
-    
-    
+    int i, j;
+    int paquets = 1;
+    for (j = 0; j < O; j++) {
+        for (i = 1; i < P; i++) {
+            time_out.tv_sec = T;
+            result = select(socket_client->fd + 1, &read_set, NULL, NULL, &time_out);
+            asynchronous_read(estat_client,socket_client,configuracio,pdu,&read_set,result);
+            paquets++;
+        }
+        for (i = 2; i < Q; i++) {
+            time_out.tv_sec = T * i;
+            result = select(socket_client->fd + 1, &read_set, NULL, NULL, &time_out);
+            asynchronous_read(estat_client,socket_client,configuracio,pdu,&read_set,result);
+            paquets++;
+        }
+        time_out.tv_sec = Q * T;
+        while (paquets <= N) {
+            result = select(socket_client->fd + 1, &read_set, NULL, NULL, &time_out);
+            asynchronous_read(estat_client,socket_client,configuracio,pdu,&read_set,result);
+            paquets++;
+        }
+        paquets = 0;
+        time_out.tv_sec = U;
+        result = select(socket_client->fd + 1, &read_set, NULL, NULL, &time_out);
+        asynchronous_read(estat_client,socket_client,configuracio,pdu,&read_set,result);
+    }
     /*
     // prepara el paquet
     PDU* pdu = (PDU*) malloc(sizeof (PDU));
@@ -167,4 +191,18 @@ int comprova_dades(Estat* estat_client, Configuracio* configuracio, Socket_clien
         return -1;
     }
     return 0;
+}
+
+void asynchronous_read(Estat* estat_client,Socket_client* socket_client,Configuracio* configuration,
+        PDU* pdu,fd_set* read_set,int result) {
+    if (result > 0) {
+        //if (FD_ISSET(socket_client->fd, &read_set)) {
+            rep_resposta(estat_client,configuration,socket_client,pdu);
+        //}
+    } else if (result < 0) {
+        fprintf(stderr,"Error al select() \n");
+    }
+    else{
+        envia(estat_client,socket_client,pdu);
+    }
 }

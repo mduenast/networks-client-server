@@ -70,6 +70,8 @@ void envia(Estat* estat_client,Socket_client* socket_client,PDU* pdu);
 void rep_resposta(Estat* estat_client,Configuracio* configuracio,Socket_client* socket_client,PDU* pdu);
 void comprova_resposta(Estat* estat_client,Configuracio* configuracio,Socket_client* socket_client,PDU* pdu);
 int comprova_dades(Estat* estat_client,Configuracio* configuracio,Socket_client* socket_client,PDU* pdu);
+void asynchronous_read(Estat* estat_client,Socket_client* socket_client,Configuracio* configuration,
+        PDU* pdu,fd_set* read_set,int result);
 
 #endif /* SUBSCRIPCIO_H */
 
