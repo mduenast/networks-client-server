@@ -31,7 +31,10 @@ typedef struct element {
 } Element;
 
 typedef struct dades_servidor{
-    
+    char ip[20];
+    char mac[12 + 1];
+    char numero_aleatori[9];
+    int udp_port;
 }Dades_servidor;
 
 typedef struct configuracio {
