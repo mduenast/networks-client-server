@@ -40,6 +40,21 @@ int subscripcio(Estat* estat_client, Configuracio* configuracio) {
     printf("El client passa al estat WAIT_ACK_SUBS\n");
     //int i;
     //for(i=1;i<N;i++){
+    
+    rep_resposta(estat_client,configuracio, socket_client, pdu);
+    memset(dades,0,sizeof(dades));
+    sprintf(dades,"%i,",configuracio->local_tcp);
+    int i;
+    for(i=0;i<(sizeof(configuracio->elements)/sizeof(Element));i++){
+        strcat(dades,configuracio->elements[i].codi);
+        if(i + 1 < (sizeof(configuracio->elements)/sizeof(Element))){
+            strcat(dades,";");
+            printf("pene");
+        }
+    }
+    prepara_pdu(pdu, SUBS_INFO, configuracio, configuracio->dades_servidor.numero_aleatori, dades);
+    socket_client->server.sin_port = htons(configuracio->dades_servidor.udp_port);
+    envia(estat_client,socket_client,pdu);
     rep_resposta(estat_client,configuracio, socket_client, pdu);
     //envia(socket_client, pdu);
     //}
@@ -98,19 +113,34 @@ void comprova_resposta(Estat* estat_client,Configuracio* configuracio, Socket_cl
         strcpy(configuracio->dades_servidor.mac,pdu->mac);
         strcpy(configuracio->dades_servidor.numero_aleatori,pdu->numero_aleatori);
         configuracio->dades_servidor.udp_port = atoi(pdu->dades);
+        estat_client->estat = WAIT_ACK_INFO;
     } else if (pdu->tipus_paquet == SUBS_NACK || pdu->tipus_paquet == SUBS_REJ) {
         estat_client->estat = NOT_SUBSCRIBED;
         printf("El client passa a estat NOT_SUBSCRIBED\n");
     } else if (pdu->tipus_paquet == INFO_ACK && estat_client->estat == WAIT_ACK_INFO) {
-        estat_client->estat = SUBSCRIBED;
-        printf("El client passa a estat SUBSCRIBED\n");
+        if(comprova_dades(estat_client,configuracio,socket_client,pdu) == 0){
+            estat_client->estat = SUBSCRIBED;
+            printf("El client passa a estat SUBSCRIBED\n");
+        }
+        else{
+            estat_client->estat = NOT_SUBSCRIBED;
+            printf("El client passa a estat NOT_SUBSCRIBED\n");
+        }
     }else{
         estat_client->estat = NOT_SUBSCRIBED;
-        printf("El client passa a estat NOT_SUBSCRIBED\n");
+        printf("---El client passa a estat NOT_SUBSCRIBED\n");
     }
 }
 
-int comprova_dades(Estat* estat_client,Socket_client* socket_client,PDU* pdu){
-    
+int comprova_dades(Estat* estat_client,Configuracio* configuracio,Socket_client* socket_client,PDU* pdu){
+    if(strcmp(configuracio->dades_servidor.ip,inet_ntoa(socket_client->server.sin_addr)) != 0){
+        return -1;
+    }
+    if(strcmp(configuracio->dades_servidor.mac,pdu->mac) != 0){
+        return -1;
+    }
+    if(strcmp(configuracio->dades_servidor.numero_aleatori,pdu->numero_aleatori) != 0){
+        return -1;
+    }
     return 0;
 }
