@@ -40,6 +40,8 @@ int main(int argc, char** argv) {
         fprintf(stderr, "Error inesperat\n");
         return (EXIT_FAILURE);
     }
+    // fase mantenir comunicacio
+    
     return (EXIT_SUCCESS);
 }
 
