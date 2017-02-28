@@ -46,40 +46,54 @@ int subscripcio(Estat* estat_client, Configuracio* configuracio) {
     fd_set read_set;
     FD_ZERO(&read_set);
     FD_SET(socket_client->fd, &read_set);
-    
+
     struct timeval time_out;
     time_out.tv_sec = T;
     int result = select(socket_client->fd + 1, &read_set, NULL, NULL, &time_out);
     asynchronous_read(estat_client, socket_client, configuracio, pdu, &read_set, result);
     int i, j;
     int paquets = 1;
-    for (j = 0; j < O && estat_client->estat == WAIT_ACK_SUBS; j++) {
-        for (i = 1; i < P && estat_client->estat == WAIT_ACK_SUBS; i++) {
+    for (j = 0; j < O && estat_client->estat != SUBSCRIBED; j++) {
+        for (i = 1; i < P && estat_client->estat != SUBSCRIBED; i++) {
             time_out.tv_sec = T;
-            envia(estat_client, socket_client, pdu);
+            printf("%i\n", estat_client->estat);
+            if (estat_client->estat == WAIT_ACK_SUBS) {
+                envia(estat_client, socket_client, pdu);
+            }
+            FD_ZERO(&read_set);
+            FD_SET(socket_client->fd, &read_set);
             result = select(socket_client->fd + 1, &read_set, NULL, NULL, &time_out);
             asynchronous_read(estat_client, socket_client, configuracio, pdu, &read_set, result);
             paquets++;
         }
-        for (i = 2; i < Q && estat_client->estat == WAIT_ACK_SUBS; i++) {
+        for (i = 2; i < Q && estat_client->estat != SUBSCRIBED; i++) {
             time_out.tv_sec = T * i;
-            envia(estat_client, socket_client, pdu);
+            printf("%i\n", estat_client->estat);
+            if (estat_client->estat == WAIT_ACK_SUBS) {
+                envia(estat_client, socket_client, pdu);
+            }
+            FD_ZERO(&read_set);
+            FD_SET(socket_client->fd, &read_set);
             result = select(socket_client->fd + 1, &read_set, NULL, NULL, &time_out);
             asynchronous_read(estat_client, socket_client, configuracio, pdu, &read_set, result);
             paquets++;
         }
         time_out.tv_sec = Q * T;
-        while (paquets <= N && estat_client->estat == WAIT_ACK_SUBS) {
-            envia(estat_client, socket_client, pdu);
+        while (paquets <= N && estat_client->estat != SUBSCRIBED) {
+            printf("%i\n", estat_client->estat);
+            if (estat_client->estat == WAIT_ACK_SUBS) {
+                envia(estat_client, socket_client, pdu);
+            }
+            FD_ZERO(&read_set);
+            FD_SET(socket_client->fd, &read_set);
             result = select(socket_client->fd + 1, &read_set, NULL, NULL, &time_out);
             asynchronous_read(estat_client, socket_client, configuracio, pdu, &read_set, result);
             paquets++;
         }
-        if(estat_client->estat == SUBSCRIBED){
-            break;
-        }
         paquets = 0;
         time_out.tv_sec = U;
+        FD_ZERO(&read_set);
+        FD_SET(socket_client->fd, &read_set);
         result = select(socket_client->fd + 1, &read_set, NULL, NULL, &time_out);
         asynchronous_read(estat_client, socket_client, configuracio, pdu, &read_set, result);
     }
@@ -161,7 +175,6 @@ void comprova_resposta(Estat* estat_client, Configuracio* configuracio, Socket_c
         if (comprova_dades(estat_client, configuracio, socket_client, pdu) == 0) {
             estat_client->estat = SUBSCRIBED;
             printf("El client passa a estat SUBSCRIBED\n");
-            exit(EXIT_SUCCESS);
         } else {
             estat_client->estat = NOT_SUBSCRIBED;
             printf("El client passa a estat NOT_SUBSCRIBED\n");
@@ -189,6 +202,7 @@ void asynchronous_read(Estat* estat_client, Socket_client* socket_client, Config
         PDU* pdu, fd_set* read_set, int result) {
     if (result > 0) {
         if (FD_ISSET(socket_client->fd, read_set)) {
+            printf("isset\n");
             rep_resposta(estat_client, configuration, socket_client, pdu);
         }
     } else if (result < 0) {
