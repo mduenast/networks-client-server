@@ -35,15 +35,18 @@ int main(int argc, char** argv) {
         fprintf(stderr, "Error inesperat\n");
         return (EXIT_FAILURE);
     }
-    // fase de registre
-    if (subscripcio(estat_client, configuracio) == -1) {
-        fprintf(stderr, "Error inesperat\n");
-        return (EXIT_FAILURE);
+    while (1) {
+        // fase de registre
+        if (subscripcio(estat_client, configuracio) == -1) {
+            fprintf(stderr, "Error inesperat\n");
+            return (EXIT_FAILURE);
+        }
+        // fase mantenir comunicacio
+        if (estat_client->estat == SUBSCRIBED) {
+
+        }
     }
-    // fase mantenir comunicacio
-    if(estat_client->estat == SUBSCRIBED){
-    }
-    
+
     return (EXIT_SUCCESS);
 }
 

@@ -18,6 +18,10 @@
 #ifndef MANTENIR_COMUNICACIO_H
 #define MANTENIR_COMUNICACIO_H
 
+#include "socket_client.h"
+#include "arguments.h"
+
+
 /*
  * PDU fase mantenir comunicacio
  */
@@ -32,6 +36,25 @@ typedef struct pdu{
 #define HELLO_REJ (int) 0x11
 
 #define V (int) 2
+#define R (int) 4
+#define S (int) 4
 
+/*
+ * PDU fase de mantenir comunicacio
+ */
+typedef struct pdu_comunicacio {
+    unsigned char tipus_paquet;
+    char mac[13];
+    char numero_aleatori[9];
+    char dades[80];
+} PDU_comunicacio;
+
+int start_socket_mantenir_comunicacio(Socket_client* socket_client, Configuracio* configuracio) ;
+
+void prepara_pdu_mantenir_comunicacio(PDU_comunicacio* pdu, unsigned char tipus_paquet, Configuracio* configuracio, char* numero_aleatori, char* dades);
+
+int comprova_dades_mantenir_comunicacio(Estat* estat_client, Configuracio* configuracio, Socket_client* socket_client, PDU_comunicacio* pdu);
+
+int mantenir_comunicacio(Estat* estat_client, Configuracio* configuracio);
 #endif /* MANTENIR_COMUNICACIO_H */
 
