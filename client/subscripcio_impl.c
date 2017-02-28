@@ -46,7 +46,7 @@ int subscripcio(Estat* estat_client, Configuracio* configuracio) {
     fd_set read_set;
     FD_ZERO(&read_set);
     FD_SET(socket_client->fd, &read_set);
-
+    
     struct timeval time_out;
     time_out.tv_sec = T;
     int result = select(socket_client->fd + 1, &read_set, NULL, NULL, &time_out);
@@ -59,8 +59,6 @@ int subscripcio(Estat* estat_client, Configuracio* configuracio) {
             envia(estat_client, socket_client, pdu);
             result = select(socket_client->fd + 1, &read_set, NULL, NULL, &time_out);
             asynchronous_read(estat_client, socket_client, configuracio, pdu, &read_set, result);
-            FD_ZERO(&read_set);
-            FD_SET(socket_client->fd, &read_set);
             paquets++;
         }
         for (i = 2; i < Q && estat_client->estat == WAIT_ACK_SUBS; i++) {
@@ -75,11 +73,9 @@ int subscripcio(Estat* estat_client, Configuracio* configuracio) {
             envia(estat_client, socket_client, pdu);
             result = select(socket_client->fd + 1, &read_set, NULL, NULL, &time_out);
             asynchronous_read(estat_client, socket_client, configuracio, pdu, &read_set, result);
-            FD_ZERO(&read_set);
-            FD_SET(socket_client->fd, &read_set);
             paquets++;
         }
-        if (estat_client->estat == SUBSCRIBED) {
+        if(estat_client->estat == SUBSCRIBED){
             break;
         }
         paquets = 0;
