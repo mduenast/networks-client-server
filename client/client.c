@@ -41,6 +41,8 @@ int main(int argc, char** argv) {
         return (EXIT_FAILURE);
     }
     // fase mantenir comunicacio
+    if(estat_client->estat == SUBSCRIBED){
+    }
     
     return (EXIT_SUCCESS);
 }

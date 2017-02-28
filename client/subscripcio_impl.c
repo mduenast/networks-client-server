@@ -56,7 +56,6 @@ int subscripcio(Estat* estat_client, Configuracio* configuracio) {
     for (j = 0; j < O && estat_client->estat != SUBSCRIBED; j++) {
         for (i = 1; i < P && estat_client->estat != SUBSCRIBED; i++) {
             time_out.tv_sec = T;
-            printf("%i\n", estat_client->estat);
             if (estat_client->estat == WAIT_ACK_SUBS) {
                 envia(estat_client, socket_client, pdu);
             }
@@ -68,7 +67,6 @@ int subscripcio(Estat* estat_client, Configuracio* configuracio) {
         }
         for (i = 2; i < Q && estat_client->estat != SUBSCRIBED; i++) {
             time_out.tv_sec = T * i;
-            printf("%i\n", estat_client->estat);
             if (estat_client->estat == WAIT_ACK_SUBS) {
                 envia(estat_client, socket_client, pdu);
             }
@@ -80,7 +78,6 @@ int subscripcio(Estat* estat_client, Configuracio* configuracio) {
         }
         time_out.tv_sec = Q * T;
         while (paquets <= N && estat_client->estat != SUBSCRIBED) {
-            printf("%i\n", estat_client->estat);
             if (estat_client->estat == WAIT_ACK_SUBS) {
                 envia(estat_client, socket_client, pdu);
             }
@@ -98,6 +95,10 @@ int subscripcio(Estat* estat_client, Configuracio* configuracio) {
         asynchronous_read(estat_client, socket_client, configuracio, pdu, &read_set, result);
     }
     close(socket_client->fd);
+    if(j == O){
+        fprintf(stderr,"No s'ha pogut establir connexio amb el servidor\n");
+        exit(EXIT_FAILURE);
+    }
     return 0;
 }
 
@@ -171,6 +172,8 @@ void comprova_resposta(Estat* estat_client, Configuracio* configuracio, Socket_c
     } else if (pdu->tipus_paquet == SUBS_NACK || pdu->tipus_paquet == SUBS_REJ) {
         estat_client->estat = NOT_SUBSCRIBED;
         printf("El client passa a estat NOT_SUBSCRIBED\n");
+        fprintf(stderr,"El servidor ha rebutjat la conexio\n");
+        exit(EXIT_FAILURE);
     } else if (pdu->tipus_paquet == INFO_ACK && estat_client->estat == WAIT_ACK_INFO) {
         if (comprova_dades(estat_client, configuracio, socket_client, pdu) == 0) {
             estat_client->estat = SUBSCRIBED;
@@ -178,6 +181,8 @@ void comprova_resposta(Estat* estat_client, Configuracio* configuracio, Socket_c
         } else {
             estat_client->estat = NOT_SUBSCRIBED;
             printf("El client passa a estat NOT_SUBSCRIBED\n");
+            fprintf(stderr,"Les dades no han pogut estar validades\n");
+            exit(EXIT_FAILURE);
         }
     } else {
         estat_client->estat = NOT_SUBSCRIBED;
@@ -202,7 +207,6 @@ void asynchronous_read(Estat* estat_client, Socket_client* socket_client, Config
         PDU* pdu, fd_set* read_set, int result) {
     if (result > 0) {
         if (FD_ISSET(socket_client->fd, read_set)) {
-            printf("isset\n");
             rep_resposta(estat_client, configuration, socket_client, pdu);
         }
     } else if (result < 0) {
