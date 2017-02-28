@@ -46,21 +46,24 @@ int subscripcio(Estat* estat_client, Configuracio* configuracio) {
     fd_set read_set;
     FD_ZERO(&read_set);
     FD_SET(socket_client->fd, &read_set);
-    
+
     struct timeval time_out;
     time_out.tv_sec = T;
     int result = select(socket_client->fd + 1, &read_set, NULL, NULL, &time_out);
+    asynchronous_read(estat_client, socket_client, configuracio, pdu, &read_set, result);
     int i, j;
     int paquets = 1;
-    for (j = 0; j < O && estat_client->estat != SUBSCRIBED; j++) {
-        for (i = 1; i < P && estat_client->estat != SUBSCRIBED; i++) {
+    for (j = 0; j < O && estat_client->estat == WAIT_ACK_SUBS; j++) {
+        for (i = 1; i < P && estat_client->estat == WAIT_ACK_SUBS; i++) {
             time_out.tv_sec = T;
             envia(estat_client, socket_client, pdu);
             result = select(socket_client->fd + 1, &read_set, NULL, NULL, &time_out);
             asynchronous_read(estat_client, socket_client, configuracio, pdu, &read_set, result);
+            FD_ZERO(&read_set);
+            FD_SET(socket_client->fd, &read_set);
             paquets++;
         }
-        for (i = 2; i < Q && estat_client->estat != SUBSCRIBED; i++) {
+        for (i = 2; i < Q && estat_client->estat == WAIT_ACK_SUBS; i++) {
             time_out.tv_sec = T * i;
             envia(estat_client, socket_client, pdu);
             result = select(socket_client->fd + 1, &read_set, NULL, NULL, &time_out);
@@ -68,13 +71,15 @@ int subscripcio(Estat* estat_client, Configuracio* configuracio) {
             paquets++;
         }
         time_out.tv_sec = Q * T;
-        while (paquets <= N && estat_client->estat != SUBSCRIBED) {
+        while (paquets <= N && estat_client->estat == WAIT_ACK_SUBS) {
             envia(estat_client, socket_client, pdu);
             result = select(socket_client->fd + 1, &read_set, NULL, NULL, &time_out);
             asynchronous_read(estat_client, socket_client, configuracio, pdu, &read_set, result);
+            FD_ZERO(&read_set);
+            FD_SET(socket_client->fd, &read_set);
             paquets++;
         }
-        if(estat_client->estat == SUBSCRIBED){
+        if (estat_client->estat == SUBSCRIBED) {
             break;
         }
         paquets = 0;
@@ -112,7 +117,6 @@ void prepara_pdu(PDU* pdu, unsigned char tipus_paquet, Configuracio* configuraci
 }
 
 void envia(Estat* estat_client, Socket_client* socket_client, PDU* pdu) {
-    printf("\n\n>>> ENVIANDO\n\n");
     int bytes = sendto(socket_client->fd, pdu, sizeof (PDU), 0,
             (struct sockaddr*) &(socket_client->server), sizeof (struct sockaddr));
     printf("Envia => tipus paquet : %c , mac : %s , numero aleatori : %s , dades : %s\n",
@@ -161,6 +165,7 @@ void comprova_resposta(Estat* estat_client, Configuracio* configuracio, Socket_c
         if (comprova_dades(estat_client, configuracio, socket_client, pdu) == 0) {
             estat_client->estat = SUBSCRIBED;
             printf("El client passa a estat SUBSCRIBED\n");
+            exit(EXIT_SUCCESS);
         } else {
             estat_client->estat = NOT_SUBSCRIBED;
             printf("El client passa a estat NOT_SUBSCRIBED\n");
@@ -186,7 +191,6 @@ int comprova_dades(Estat* estat_client, Configuracio* configuracio, Socket_clien
 
 void asynchronous_read(Estat* estat_client, Socket_client* socket_client, Configuracio* configuration,
         PDU* pdu, fd_set* read_set, int result) {
-    printf("\n\n>>> LEYENDO\n\n");
     if (result > 0) {
         if (FD_ISSET(socket_client->fd, read_set)) {
             rep_resposta(estat_client, configuration, socket_client, pdu);
