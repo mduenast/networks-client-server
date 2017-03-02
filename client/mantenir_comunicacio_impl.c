@@ -25,7 +25,6 @@
 #include <sys/time.h>
 #include <sys/types.h>
 
-
 int start_socket_mantenir_comunicacio(Socket_client* socket_client, Configuracio* configuracio) {
     socket_client->he = gethostbyname(configuracio->server);
     if (socket_client->he == NULL) {
@@ -64,7 +63,29 @@ int comprova_dades_mantenir_comunicacio(Estat* estat_client, Configuracio* confi
     return 0;
 }
 
-int mantenir_comunicacio(Estat* estat_client, Configuracio* configuracio){
+int mantenir_comunicacio(Estat* estat_client, Configuracio* configuracio) {
+    Socket_client* socket_client = (Socket_client*) malloc(sizeof (Socket_client));
+    if (start_socket_mantenir_comunicacio(socket_client, configuracio) == -1) {
+        return -1;
+    }
+
+    // prepara el paquet
+    PDU_comunicacio* pdu = (PDU_comunicacio*) malloc(sizeof (PDU_comunicacio));
+    char dades[80];
+    sprintf(dades, "%s,%s", configuracio->name, configuracio->situation);
+    prepara_pdu_mantenir_comunicacio(pdu, HELLO, configuracio, configuracio->dades_servidor.numero_aleatori, dades);
+    // envia el paquet
+    envia_mantenir_comunicacio(estat_client, socket_client, pdu);
     
     return 0;
+}
+
+void envia_mantenir_comunicacio(Estat* estat_client, Socket_client* socket_client, PDU_comunicacio* pdu) {
+    int bytes = sendto(socket_client->fd, pdu, sizeof (PDU_comunicacio), 0,
+            (struct sockaddr*) &(socket_client->server), sizeof (struct sockaddr));
+    printf("Envia => tipus paquet : %c , mac : %s , numero aleatori : %s , dades : %s\n",
+            pdu->tipus_paquet, pdu->mac, pdu->numero_aleatori, pdu->dades);
+    if (bytes == -1) {
+        fprintf(stderr, "sendto() error\n");
+    }
 }

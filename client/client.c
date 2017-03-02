@@ -21,6 +21,7 @@
 #include "estat_client.h"
 #include "arguments.h"
 #include "subscripcio.h"
+#include "mantenir_comunicacio.h"
 
 /*
  * 
@@ -43,8 +44,9 @@ int main(int argc, char** argv) {
         }
         // fase mantenir comunicacio
         if (estat_client->estat == SUBSCRIBED) {
-
+            mantenir_comunicacio(estat_client,configuracio);
         }
+        break;
     }
 
     return (EXIT_SUCCESS);
