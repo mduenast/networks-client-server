@@ -21,6 +21,7 @@
 #include "stdlib.h"
 #include "unistd.h"
 #include "arguments.h"
+#include "subscripcio.h"
 #include <sys/select.h>
 #include <sys/time.h>
 #include <sys/types.h>
@@ -74,18 +75,79 @@ int mantenir_comunicacio(Estat* estat_client, Configuracio* configuracio) {
     char dades[80];
     sprintf(dades, "%s,%s", configuracio->name, configuracio->situation);
     prepara_pdu_mantenir_comunicacio(pdu, HELLO, configuracio, configuracio->dades_servidor.numero_aleatori, dades);
+
     // envia el paquet
     envia_mantenir_comunicacio(estat_client, socket_client, pdu);
-    
+
+    fd_set read_set;
+    FD_ZERO(&read_set);
+    FD_SET(socket_client->fd, &read_set);
+
+    struct timeval time_out;
+    time_out.tv_sec = V;
+    int result = select(socket_client->fd + 1, &read_set, NULL, NULL, &time_out);
+    asynchronous_read_mantenir_comunicacio(estat_client, socket_client, configuracio, pdu, &read_set, result);
+    while (1) {
+        
+        sprintf(dades, "%s,%s", configuracio->name, configuracio->situation);
+        prepara_pdu_mantenir_comunicacio(pdu, HELLO, configuracio, configuracio->dades_servidor.numero_aleatori, dades);
+        envia_mantenir_comunicacio(estat_client, socket_client, pdu);
+        sleep(V);
+        FD_ZERO(&read_set);
+        FD_SET(socket_client->fd, &read_set);
+        int result = select(socket_client->fd + 1, &read_set, NULL, NULL, &time_out);
+        asynchronous_read_mantenir_comunicacio(estat_client, socket_client, configuracio, pdu, &read_set, result);
+    }
     return 0;
 }
 
-void envia_mantenir_comunicacio(Estat* estat_client, Socket_client* socket_client, PDU_comunicacio* pdu) {
+void envia_mantenir_comunicacio(Estat* estat_client, Socket_client* socket_client,
+        PDU_comunicacio* pdu) {
     int bytes = sendto(socket_client->fd, pdu, sizeof (PDU_comunicacio), 0,
             (struct sockaddr*) &(socket_client->server), sizeof (struct sockaddr));
     printf("Envia => tipus paquet : %c , mac : %s , numero aleatori : %s , dades : %s\n",
             pdu->tipus_paquet, pdu->mac, pdu->numero_aleatori, pdu->dades);
     if (bytes == -1) {
         fprintf(stderr, "sendto() error\n");
+    }
+}
+
+void asynchronous_read_mantenir_comunicacio(Estat* estat_client,
+        Socket_client* socket_client, Configuracio* configuration,
+        PDU_comunicacio* pdu, fd_set* read_set, int result) {
+    if (result > 0) {
+        if (FD_ISSET(socket_client->fd, read_set)) {
+            rep_resposta_mantenir_comunicacio(estat_client, configuration, socket_client, pdu);
+        }
+    } else if (result < 0) {
+        fprintf(stderr, "Error al select() \n");
+    }
+}
+
+void rep_resposta_mantenir_comunicacio(Estat* estat_client,
+        Configuracio* configuracio, Socket_client* socket_client, PDU_comunicacio* pdu) {
+    socklen_t socklen = sizeof (struct sockaddr);
+    int bytes = recvfrom(socket_client->fd, pdu, sizeof (PDU_comunicacio),
+            0, (struct sockaddr*) &(socket_client->server), &socklen);
+    printf("Rep => tipus paquet : %c , mac : %s , numero aleatori : %s , dades : %s\n",
+            pdu->tipus_paquet, pdu->mac, pdu->numero_aleatori, pdu->dades);
+    if (bytes == -1) {
+        fprintf(stderr, "recvfrom() error\n");
+    }
+    comprova_resposta_mantenir_comunicacio(estat_client, configuracio, socket_client, pdu);
+}
+
+void comprova_resposta_mantenir_comunicacio(Estat* estat_client,
+        Configuracio* configuracio, Socket_client* socket_client, PDU_comunicacio* pdu) {
+    if (pdu->tipus_paquet == HELLO) {
+        char dades[80];
+        sprintf(dades, "%s,%s", configuracio->name, configuracio->situation);
+        if (comprova_dades_mantenir_comunicacio(estat_client, configuracio, socket_client, pdu) == 0 &&
+                strcmp(pdu->dades, dades) == 0) {
+            estat_client->estat = SEND_HELLO;
+            printf("El client passa a estat SEND_HELLO\n");
+        }
+    } else {
+        exit(-1);
     }
 }

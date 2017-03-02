@@ -48,5 +48,18 @@ int mantenir_comunicacio(Estat* estat_client, Configuracio* configuracio);
 
 void envia_mantenir_comunicacio(Estat* estat_client, Socket_client* socket_client, PDU_comunicacio* pdu);
 
+void asynchronous_read_mantenir_comunicacio(Estat* estat_client, 
+        Socket_client* socket_client, Configuracio* configuration,
+        PDU_comunicacio* pdu, fd_set* read_set, int result);
+
+void rep_resposta_mantenir_comunicacio(Estat* estat_client, 
+        Configuracio* configuracio, Socket_client* socket_client, PDU_comunicacio* pdu);
+
+void comprova_resposta_mantenir_comunicacio(Estat* estat_client, 
+        Configuracio* configuracio, Socket_client* socket_client, PDU_comunicacio* pdu) ;
+
+int comprova_dades_mantenir_comunicacio(Estat* estat_client, Configuracio* configuracio, 
+        Socket_client* socket_client, PDU_comunicacio* pdu);
+
 #endif /* MANTENIR_COMUNICACIO_H */
 

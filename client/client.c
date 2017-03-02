@@ -44,9 +44,11 @@ int main(int argc, char** argv) {
         }
         // fase mantenir comunicacio
         if (estat_client->estat == SUBSCRIBED) {
-            mantenir_comunicacio(estat_client,configuracio);
+            if(mantenir_comunicacio(estat_client,configuracio) == -1){
+                fprintf(stderr,"Error inesperat\n");
+                return(EXIT_FAILURE);
+            }
         }
-        break;
     }
 
     return (EXIT_SUCCESS);
