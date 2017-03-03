@@ -84,9 +84,12 @@ int mantenir_comunicacio(Estat* estat_client, Configuracio* configuracio) {
     FD_SET(socket_client->fd, &read_set);
 
     struct timeval time_out;
-    time_out.tv_sec = V;
+    time_out.tv_sec = 0;
     int result = select(socket_client->fd + 1, &read_set, NULL, NULL, &time_out);
     asynchronous_read_mantenir_comunicacio(estat_client, socket_client, configuracio, pdu, &read_set, result);
+    
+    int perduts = 0;
+    
     while (1) {
         
         sprintf(dades, "%s,%s", configuracio->name, configuracio->situation);
@@ -96,6 +99,14 @@ int mantenir_comunicacio(Estat* estat_client, Configuracio* configuracio) {
         FD_ZERO(&read_set);
         FD_SET(socket_client->fd, &read_set);
         int result = select(socket_client->fd + 1, &read_set, NULL, NULL, &time_out);
+        if(result == 0){
+            perduts++;
+        }
+        if(perduts == R){
+            estat_client->estat = NOT_SUBSCRIBED;
+            printf("Client passa a estat NOT_SUBSCRIBED\n");
+            break;
+        }
         asynchronous_read_mantenir_comunicacio(estat_client, socket_client, configuracio, pdu, &read_set, result);
     }
     return 0;
