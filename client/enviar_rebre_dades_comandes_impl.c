@@ -20,6 +20,9 @@
 #include "subscripcio.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 void* espera_comandes(void* params) {
     Parametres* parametres = (Parametres*) params;
@@ -34,7 +37,22 @@ int comandes(Estat* estat_client, Configuracio* configuracio) {
     while (estat_client->estat == SEND_HELLO) {
         char commanda [100];
         if (fgets(commanda, 100, stdin) != NULL) {
-            printf("Comanda = %s \n",commanda);
+            if(strcmp("quit\n",commanda) == 0){
+                printf("Sortint ...\n");
+                kill(getpid(),SIGINT);
+            }
+            else if(strcmp("stat\n", commanda) == 0 ){
+                printf("MAC : %s\n",configuracio->mac);
+                printf("Nom : %s\n",configuracio->name);
+                printf("Situacio : %s\n",configuracio->situation);
+                int i;
+                for(i=0;i<10;i++){
+                    printf("Element %i : %s\n",i,configuracio->elements[i].codi);
+                }
+            }
+            else{
+                fprintf(stderr,"No es reconeix la commanda\n");
+            }
         }
     }
     return 0;
