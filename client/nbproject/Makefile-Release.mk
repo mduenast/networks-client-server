@@ -37,6 +37,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 OBJECTFILES= \
 	${OBJECTDIR}/arguments_impl.o \
 	${OBJECTDIR}/client.o \
+	${OBJECTDIR}/enviar_rebre_dades_comandes_impl.o \
 	${OBJECTDIR}/mantenir_comunicacio_impl.o \
 	${OBJECTDIR}/subscripcio_impl.o
 
@@ -74,6 +75,11 @@ ${OBJECTDIR}/client.o: client.c
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.c) -O2 -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/client.o client.c
+
+${OBJECTDIR}/enviar_rebre_dades_comandes_impl.o: enviar_rebre_dades_comandes_impl.c
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.c) -O2 -std=c99 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/enviar_rebre_dades_comandes_impl.o enviar_rebre_dades_comandes_impl.c
 
 ${OBJECTDIR}/mantenir_comunicacio_impl.o: mantenir_comunicacio_impl.c
 	${MKDIR} -p ${OBJECTDIR}

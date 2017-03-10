@@ -5,6 +5,7 @@
                    displayName="Header Files"
                    projectFiles="true">
       <itemPath>arguments.h</itemPath>
+      <itemPath>enviar_rebre_dades_comandes.h</itemPath>
       <itemPath>estat_client.h</itemPath>
       <itemPath>mantenir_comunicacio.h</itemPath>
       <itemPath>socket_client.h</itemPath>
@@ -19,6 +20,7 @@
                    projectFiles="true">
       <itemPath>arguments_impl.c</itemPath>
       <itemPath>client.c</itemPath>
+      <itemPath>enviar_rebre_dades_comandes_impl.c</itemPath>
       <itemPath>mantenir_comunicacio_impl.c</itemPath>
       <itemPath>subscripcio_impl.c</itemPath>
     </logicalFolder>
@@ -45,7 +47,7 @@
       <compileType>
         <cTool>
           <standard>3</standard>
-          <commandLine>-ansi -pedantic -Wall</commandLine>
+          <commandLine>-pthread -ansi -pedantic -Wall</commandLine>
         </cTool>
       </compileType>
       <item path="arguments.h" ex="false" tool="3" flavor2="0">
@@ -53,6 +55,10 @@
       <item path="arguments_impl.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="client.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="enviar_rebre_dades_comandes.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="enviar_rebre_dades_comandes_impl.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="estat_client.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -93,6 +99,10 @@
       <item path="arguments_impl.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="client.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="enviar_rebre_dades_comandes.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="enviar_rebre_dades_comandes_impl.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="estat_client.h" ex="false" tool="3" flavor2="0">
       </item>

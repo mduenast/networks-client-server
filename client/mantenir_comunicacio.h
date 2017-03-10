@@ -20,6 +20,7 @@
 
 #include "socket_client.h"
 #include "arguments.h"
+#include <pthread.h>
 
 #define HELLO (int) 0x10
 #define HELLO_REJ (int) 0x11
