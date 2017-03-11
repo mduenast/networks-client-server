@@ -130,8 +130,10 @@ void prepara_pdu(PDU* pdu, unsigned char tipus_paquet, Configuracio* configuraci
 void envia(Estat* estat_client, Socket_client* socket_client, PDU* pdu) {
     int bytes = sendto(socket_client->fd, pdu, sizeof (PDU), 0,
             (struct sockaddr*) &(socket_client->server), sizeof (struct sockaddr));
-    printf("Envia => tipus paquet : %c , mac : %s , numero aleatori : %s , dades : %s\n",
-            pdu->tipus_paquet, pdu->mac, pdu->numero_aleatori, pdu->dades);
+    if(estat_client->debug == 1){
+        printf("Envia => tipus paquet : %c , mac : %s , numero aleatori : %s , dades : %s\n",
+                pdu->tipus_paquet, pdu->mac, pdu->numero_aleatori, pdu->dades);
+    }
     if (bytes == -1) {
         fprintf(stderr, "sendto() error\n");
     }
@@ -140,8 +142,10 @@ void envia(Estat* estat_client, Socket_client* socket_client, PDU* pdu) {
 void rep_resposta(Estat* estat_client, Configuracio* configuracio, Socket_client* socket_client, PDU* pdu) {
     socklen_t socklen = sizeof (struct sockaddr);
     int bytes = recvfrom(socket_client->fd, pdu, sizeof (PDU), 0, (struct sockaddr*) &(socket_client->server), &socklen);
-    printf("Rep => tipus paquet : %c , mac : %s , numero aleatori : %s , dades : %s\n",
-            pdu->tipus_paquet, pdu->mac, pdu->numero_aleatori, pdu->dades);
+    if(estat_client->debug == 1){
+        printf("Rep => tipus paquet : %c , mac : %s , numero aleatori : %s , dades : %s\n",
+                pdu->tipus_paquet, pdu->mac, pdu->numero_aleatori, pdu->dades);
+    }
     if (bytes == -1) {
         fprintf(stderr, "recvfrom() error\n");
     }

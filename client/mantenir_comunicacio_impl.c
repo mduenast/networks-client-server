@@ -27,6 +27,7 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <pthread.h>
+#include <signal.h>
 
 int start_socket_mantenir_comunicacio(Socket_client* socket_client, Configuracio* configuracio) {
     socket_client->he = gethostbyname(configuracio->server);
@@ -102,19 +103,19 @@ int mantenir_comunicacio(Estat* estat_client, Configuracio* configuracio) {
                     malloc(sizeof (Parametres));
             params->estat_client = estat_client;
             params->configuracio = configuracio;
-            if (pthread_create(&thread_comandes,NULL,(void* (*)(void*)) espera_comandes,(void*)(params))){
-                    fprintf(stderr, "Error creant thread\n");
-                    return 1;
+            if (pthread_create(&thread_comandes, NULL, (void* (*)(void*)) espera_comandes, (void*) (params))) {
+                fprintf(stderr, "Error creant thread\n");
+                return 1;
             }
         }
 
         sprintf(dades, "%s,%s", configuracio->name, configuracio->situation);
-                prepara_pdu_mantenir_comunicacio(pdu, HELLO, configuracio, configuracio->dades_servidor.numero_aleatori, dades);
-                envia_mantenir_comunicacio(estat_client, socket_client, pdu);
-                sleep(V);
-                FD_ZERO(&read_set);
-                FD_SET(socket_client->fd, &read_set);
-                int result = select(socket_client->fd + 1, &read_set, NULL, NULL, &time_out);
+        prepara_pdu_mantenir_comunicacio(pdu, HELLO, configuracio, configuracio->dades_servidor.numero_aleatori, dades);
+        envia_mantenir_comunicacio(estat_client, socket_client, pdu);
+        sleep(V);
+        FD_ZERO(&read_set);
+        FD_SET(socket_client->fd, &read_set);
+        int result = select(socket_client->fd + 1, &read_set, NULL, NULL, &time_out);
         if (result == 0) {
             perduts++;
         } else {
@@ -122,7 +123,7 @@ int mantenir_comunicacio(Estat* estat_client, Configuracio* configuracio) {
         }
         if (perduts == R) {
             estat_client->estat = NOT_SUBSCRIBED;
-                    printf("Client passa a estat NOT_SUBSCRIBED\n");
+            printf("Client passa a estat NOT_SUBSCRIBED\n");
             break;
         }
         asynchronous_read_mantenir_comunicacio(estat_client, socket_client, configuracio, pdu, &read_set, result);
@@ -140,8 +141,10 @@ void envia_mantenir_comunicacio(Estat* estat_client, Socket_client* socket_clien
         PDU_comunicacio* pdu) {
     int bytes = sendto(socket_client->fd, pdu, sizeof (PDU_comunicacio), 0,
             (struct sockaddr*) &(socket_client->server), sizeof (struct sockaddr));
-            printf("Envia => tipus paquet : %c , mac : %s , numero aleatori : %s , dades : %s\n",
-            pdu->tipus_paquet, pdu->mac, pdu->numero_aleatori, pdu->dades);
+    if(estat_client->debug == 1){
+        printf("Envia => tipus paquet : %c , mac : %s , numero aleatori : %s , dades : %s\n",
+                pdu->tipus_paquet, pdu->mac, pdu->numero_aleatori, pdu->dades);
+    }
     if (bytes == -1) {
 
         fprintf(stderr, "sendto() error\n");
@@ -164,10 +167,12 @@ void asynchronous_read_mantenir_comunicacio(Estat* estat_client,
 void rep_resposta_mantenir_comunicacio(Estat* estat_client,
         Configuracio* configuracio, Socket_client* socket_client, PDU_comunicacio* pdu) {
     socklen_t socklen = sizeof (struct sockaddr);
-            int bytes = recvfrom(socket_client->fd, pdu, sizeof (PDU_comunicacio),
+    int bytes = recvfrom(socket_client->fd, pdu, sizeof (PDU_comunicacio),
             0, (struct sockaddr*) &(socket_client->server), &socklen);
-            printf("Rep => tipus paquet : %c , mac : %s , numero aleatori : %s , dades : %s\n",
-            pdu->tipus_paquet, pdu->mac, pdu->numero_aleatori, pdu->dades);
+    if(estat_client->debug == 1){
+        printf("Rep => tipus paquet : %c , mac : %s , numero aleatori : %s , dades : %s\n",
+                pdu->tipus_paquet, pdu->mac, pdu->numero_aleatori, pdu->dades);
+    }
     if (bytes == -1) {
 
         fprintf(stderr, "recvfrom() error\n");
@@ -179,11 +184,13 @@ void comprova_resposta_mantenir_comunicacio(Estat* estat_client,
         Configuracio* configuracio, Socket_client* socket_client, PDU_comunicacio* pdu) {
     if (pdu->tipus_paquet == HELLO) {
         char dades[80];
-                sprintf(dades, "%s,%s", configuracio->name, configuracio->situation);
+        sprintf(dades, "%s,%s", configuracio->name, configuracio->situation);
         if (comprova_dades_mantenir_comunicacio(estat_client, configuracio, socket_client, pdu) == 0 &&
                 strcmp(pdu->dades, dades) == 0) {
+            if(estat_client->estat != SEND_HELLO){
+                printf("El client passa a estat SEND_HELLO\n");
+            }
             estat_client->estat = SEND_HELLO;
-                    printf("El client passa a estat SEND_HELLO\n");
         }
     } else {
         exit(-1);

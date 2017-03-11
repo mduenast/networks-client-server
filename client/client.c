@@ -31,8 +31,9 @@ int main(int argc, char** argv) {
     Estat* estat_client = (Estat*) malloc(sizeof (Estat));
     Arguments* arguments = (Arguments*) malloc(sizeof (Arguments));
     Configuracio* configuracio = (Configuracio*) malloc(sizeof (Configuracio));
+    estat_client->debug = 0;
     // Entren els arguments
-    if (parse_args(argc, argv, arguments, configuracio) == -1) {
+    if (parse_args(argc, argv, arguments, configuracio,estat_client) == -1) {
         fprintf(stderr, "Error inesperat\n");
         return (EXIT_FAILURE);
     }

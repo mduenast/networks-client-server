@@ -16,6 +16,7 @@
  */
 
 #include "arguments.h"
+#include "estat_client.h"
 
 void init_arguments(Arguments* arguments) {
     strcpy(arguments->arxiu_configuracio, "client.cfg");
@@ -34,12 +35,21 @@ void get_elements(char* value, Configuracio* configuracio) {
     }
 }
 
-int parse_args(int argc, char** argv, Arguments* arguments, Configuracio* configuracio) {
+int parse_args(int argc, char** argv, Arguments* arguments, Configuracio* configuracio,Estat* estat_client) {
     int i;
     init_arguments(arguments);
     for (i = 0; i < argc; i++) {
         if (strcmp("-c", argv[i]) == 0) {
             strcpy(arguments->arxiu_configuracio, argv[i + 1]);
+        }
+        else if(strcmp("-d",argv[i]) == 0){
+            estat_client->debug = 1;
+        }
+        else if(strcmp("\n",argv[i]) == 0 || strcmp("./client",argv[i]) == 0){
+            
+        }
+        else{
+            printf("Commanda no reconeguda\n");
         }
     }
     read_configuration(configuracio, arguments);

@@ -19,6 +19,8 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "estat_client.h"
+
 #ifndef ARGUMENTS_H
 #define ARGUMENTS_H 
 
@@ -49,7 +51,7 @@ typedef struct configuracio {
 } Configuracio;
 
 void init_arguments(Arguments* arguments);
-int parse_args(int argc, char** argv, Arguments* arguments, Configuracio* configuracio);
+int parse_args(int argc, char** argv, Arguments* arguments, Configuracio* configuracio,Estat* estat_client);
 int read_configuration(Configuracio* configuracio, Arguments* arguments);
 void get_elements(char* value, Configuracio* configuracio);
 

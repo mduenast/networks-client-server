@@ -20,6 +20,7 @@
 
 typedef struct estat_client {
     int estat;
+    int debug;
 } Estat;
 
 

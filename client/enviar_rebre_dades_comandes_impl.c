@@ -18,41 +18,62 @@
 #include "enviar_rebre_dades_comandes.h"
 #include "estat_client.h"
 #include "subscripcio.h"
+#include <sys/types.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/select.h>
+#include <sys/time.h>
+#include <sys/types.h>
 
 void* espera_comandes(void* params) {
     Parametres* parametres = (Parametres*) params;
     if (comandes(parametres->estat_client, parametres->configuracio) == -1) {
-        fprintf(stderr,"Hi ha hagut un error inesperat\n");
+        fprintf(stderr, "Hi ha hagut un error inesperat\n");
         exit(EXIT_FAILURE);
     }
     return NULL;
 }
 
 int comandes(Estat* estat_client, Configuracio* configuracio) {
+    fd_set read_set;
+    FD_ZERO(&read_set);
+    FD_SET(0, &read_set);
+    struct timeval time_out;
+    time_out.tv_sec = 0;
+    int result = 0;
+
+    char commanda [100];
     while (estat_client->estat == SEND_HELLO) {
-        char commanda [100];
-        if (fgets(commanda, 100, stdin) != NULL) {
-            if(strcmp("quit\n",commanda) == 0){
-                printf("Sortint ...\n");
-                kill(getpid(),SIGINT);
-            }
-            else if(strcmp("stat\n", commanda) == 0 ){
-                printf("MAC : %s\n",configuracio->mac);
-                printf("Nom : %s\n",configuracio->name);
-                printf("Situacio : %s\n",configuracio->situation);
-                int i;
-                for(i=0;i<10;i++){
-                    printf("Element %i : %s\n",i,configuracio->elements[i].codi);
+        FD_ZERO(&read_set);
+        FD_SET(0, &read_set);
+        struct timeval time_out;
+        result = select(1, &read_set, NULL, NULL, &time_out);
+        if (result > 0) {
+            if (FD_ISSET(0, &read_set)) {
+                if (fgets(commanda, 100, stdin) != NULL) {
+                    if (strcmp("quit\n", commanda) == 0) {
+                        printf("Sortint ...\n");
+                        kill(getpid(), SIGINT);
+                    } else if (strcmp("stat\n", commanda) == 0) {
+                        printf("MAC : %s\n", configuracio->mac);
+                        printf("Nom : %s\n", configuracio->name);
+                        printf("Situacio : %s\n", configuracio->situation);
+                        int i;
+                        for (i = 0; i < 10; i++) {
+                            printf("Element %i : %s\n", i, configuracio->elements[i].codi);
+                        }
+                    } else if (strcmp("\n", commanda) == 0) {
+
+                    } else {
+                        fprintf(stderr, "No es reconeix la commanda\n");
+                    }
                 }
             }
-            else{
-                fprintf(stderr,"No es reconeix la commanda\n");
-            }
+        } else if (result < 0) {
+            fprintf(stderr, "Error al select() \n");
         }
     }
     return 0;
