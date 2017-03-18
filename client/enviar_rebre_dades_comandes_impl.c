@@ -49,7 +49,6 @@ int comandes(Estat* estat_client, Configuracio* configuracio) {
     while (estat_client->estat == SEND_HELLO) {
         FD_ZERO(&read_set);
         FD_SET(0, &read_set);
-        struct timeval time_out;
         result = select(1, &read_set, NULL, NULL, &time_out);
         if (result > 0) {
             if (FD_ISSET(0, &read_set)) {
@@ -65,8 +64,20 @@ int comandes(Estat* estat_client, Configuracio* configuracio) {
                         for (i = 0; i < 10; i++) {
                             printf("Element %i : %s\n", i, configuracio->elements[i].codi);
                         }
+                    } else if (strncmp("set", commanda, strlen("set")) == 0) {
+                        char dispositiu[20];
+                        char valor[20];
+                        sscanf(commanda,"set %s %s\n",dispositiu,valor);
+                        int i;
+                        for(i=0;i<sizeof(configuracio->elements)/sizeof(Element);i++){
+                            if(strncmp(dispositiu,configuracio->elements[i].codi,strlen(dispositiu))== 0
+                                && configuracio->elements[i].codi[strlen(configuracio->elements[i].codi) -1] == 'I'){
+                                sprintf(configuracio->elements[i].codi,"%s-%i-I",dispositiu,atoi(valor));
+                                break;
+                            }
+                        }
                     } else if (strcmp("\n", commanda) == 0) {
-
+                        
                     } else {
                         fprintf(stderr, "No es reconeix la commanda\n");
                     }

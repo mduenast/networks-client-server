@@ -105,7 +105,7 @@ int mantenir_comunicacio(Estat* estat_client, Configuracio* configuracio) {
             params->configuracio = configuracio;
             if (pthread_create(&thread_comandes, NULL, (void* (*)(void*)) espera_comandes, (void*) (params))) {
                 fprintf(stderr, "Error creant thread\n");
-                return 1;
+                return -1;
             }
         }
 
@@ -123,16 +123,14 @@ int mantenir_comunicacio(Estat* estat_client, Configuracio* configuracio) {
         }
         if (perduts == R) {
             estat_client->estat = NOT_SUBSCRIBED;
-            printf("Client passa a estat NOT_SUBSCRIBED\n");
+            printf("El client passa a estat NOT_SUBSCRIBED\n");
             break;
         }
         asynchronous_read_mantenir_comunicacio(estat_client, socket_client, configuracio, pdu, &read_set, result);
     }
     if (pthread_join(thread_comandes, NULL)) {
         fprintf(stderr, "Error join thread\n");
-
-        return 2;
-
+        return -1;
     }
     return 0;
 }
