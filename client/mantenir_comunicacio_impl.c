@@ -29,6 +29,10 @@
 #include <pthread.h>
 #include <signal.h>
 
+void alarm_handle(int sig){
+    signal(SIGALRM,alarm_handle);
+}
+
 int start_socket_mantenir_comunicacio(Socket_client* socket_client, Configuracio* configuracio) {
     socket_client->he = gethostbyname(configuracio->server);
     if (socket_client->he == NULL) {
@@ -88,7 +92,11 @@ int mantenir_comunicacio(Estat* estat_client, Configuracio* configuracio) {
 
     struct timeval time_out;
     time_out.tv_sec = 0;
-    sleep(V);
+    
+    signal(SIGALRM,alarm_handle);
+    alarm(V);
+    pause();
+    
     int result = select(socket_client->fd + 1, &read_set, NULL, NULL, &time_out);
     asynchronous_read_mantenir_comunicacio(estat_client, socket_client, configuracio, pdu, &read_set, result);
 
@@ -113,7 +121,10 @@ int mantenir_comunicacio(Estat* estat_client, Configuracio* configuracio) {
         sprintf(dades, "%s,%s", configuracio->name, configuracio->situation);
         prepara_pdu_mantenir_comunicacio(pdu, HELLO, configuracio, configuracio->dades_servidor.numero_aleatori, dades);
         envia_mantenir_comunicacio(estat_client, socket_client, pdu);
-        sleep(V);
+        
+        alarm(V);
+        pause();
+        
         FD_ZERO(&read_set);
         FD_SET(socket_client->fd, &read_set);
         int result = select(socket_client->fd + 1, &read_set, NULL, NULL, &time_out);

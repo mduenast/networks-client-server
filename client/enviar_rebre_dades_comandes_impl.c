@@ -67,6 +67,10 @@ void set(char* commanda, Configuracio* configuracio) {
     }
 }
 
+/*int send(char* nom_dispositiu,Configuracio* configuracio){
+    return 0;
+}*/
+
 int comandes(Estat* estat_client, Configuracio* configuracio) {
     fd_set read_set;
     FD_ZERO(&read_set);
@@ -102,3 +106,4 @@ int comandes(Estat* estat_client, Configuracio* configuracio) {
     }
     return 0;
 }
+
