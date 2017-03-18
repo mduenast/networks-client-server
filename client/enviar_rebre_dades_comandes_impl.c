@@ -37,6 +37,37 @@ void* espera_comandes(void* params) {
     return NULL;
 }
 
+void quit() {
+    printf("Sortint ...\n");
+    kill(getpid(), SIGINT);
+}
+
+void stat(Configuracio* configuracio) {
+    printf("MAC : %s\n", configuracio->mac);
+    printf("Nom : %s\n", configuracio->name);
+    printf("Situacio : %s\n", configuracio->situation);
+    int i;
+    for (i = 0; i < 10; i++) {
+        printf("Element %i : %s\n", i, configuracio->elements[i].codi);
+    }
+}
+
+void set(char* commanda, Configuracio* configuracio) {
+    char dispositiu[20];
+    char valor[20];
+    sscanf(commanda, "set %s %s\n", dispositiu, valor);
+    if (strlen(valor) == 1 && strlen(dispositiu) == 3) {
+        int i;
+        for (i = 0; i<sizeof (configuracio->elements) / sizeof (Element); i++) {
+            if (strncmp(dispositiu, configuracio->elements[i].codi, strlen(dispositiu)) == 0
+                    && configuracio->elements[i].codi[strlen(configuracio->elements[i].codi) - 1] == 'I') {
+                sprintf(configuracio->elements[i].codi, "%s-%i-I", dispositiu, atoi(valor));
+                break;
+            }
+        }
+    }
+}
+
 int comandes(Estat* estat_client, Configuracio* configuracio) {
     fd_set read_set;
     FD_ZERO(&read_set);
@@ -54,30 +85,13 @@ int comandes(Estat* estat_client, Configuracio* configuracio) {
             if (FD_ISSET(0, &read_set)) {
                 if (fgets(commanda, 100, stdin) != NULL) {
                     if (strcmp("quit\n", commanda) == 0) {
-                        printf("Sortint ...\n");
-                        kill(getpid(), SIGINT);
+                        quit();
                     } else if (strcmp("stat\n", commanda) == 0) {
-                        printf("MAC : %s\n", configuracio->mac);
-                        printf("Nom : %s\n", configuracio->name);
-                        printf("Situacio : %s\n", configuracio->situation);
-                        int i;
-                        for (i = 0; i < 10; i++) {
-                            printf("Element %i : %s\n", i, configuracio->elements[i].codi);
-                        }
+                        stat(configuracio);
                     } else if (strncmp("set", commanda, strlen("set")) == 0) {
-                        char dispositiu[20];
-                        char valor[20];
-                        sscanf(commanda,"set %s %s\n",dispositiu,valor);
-                        int i;
-                        for(i=0;i<sizeof(configuracio->elements)/sizeof(Element);i++){
-                            if(strncmp(dispositiu,configuracio->elements[i].codi,strlen(dispositiu))== 0
-                                && configuracio->elements[i].codi[strlen(configuracio->elements[i].codi) -1] == 'I'){
-                                sprintf(configuracio->elements[i].codi,"%s-%i-I",dispositiu,atoi(valor));
-                                break;
-                            }
-                        }
+                        set(commanda, configuracio);
                     } else if (strcmp("\n", commanda) == 0) {
-                        
+
                     } else {
                         fprintf(stderr, "No es reconeix la commanda\n");
                     }

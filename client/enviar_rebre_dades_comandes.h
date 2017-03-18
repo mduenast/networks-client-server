@@ -46,6 +46,9 @@ typedef struct parametres{
     Estat* estat_client;
 }Parametres;
 
+void quit();
+void stat(Configuracio* configuracio);
+void set(char* commanda,Configuracio* configuracio);
 void* espera_comandes(void* params);
 int comandes(Estat* estat_client, Configuracio* configuracio);
 
