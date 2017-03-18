@@ -29,6 +29,8 @@ void get_elements(char* value, Configuracio* configuracio) {
     while (token != NULL) {
         if (i < 10) {
             strcpy(configuracio->elements[i].codi, token);
+            //valor per defecte
+            configuracio->elements[i].valor = 0; 
             token = strtok(NULL, ";");
         }
         i++;

@@ -32,12 +32,12 @@
 int start_socket_mantenir_comunicacio(Socket_client* socket_client, Configuracio* configuracio) {
     socket_client->he = gethostbyname(configuracio->server);
     if (socket_client->he == NULL) {
-        fprintf(stderr, "gethostbyname() error\n");
+        fprintf(stderr, "SEVERE => gethostbyname() error\n");
         return -1;
     }
     socket_client->fd = socket(AF_INET, SOCK_DGRAM, 0);
     if (socket_client->fd == -1) {
-        fprintf(stderr, "socket() error\n");
+        fprintf(stderr, "SEVERE => socket() error\n");
         return -1;
     }
     socket_client->server.sin_family = AF_INET;
@@ -104,7 +104,7 @@ int mantenir_comunicacio(Estat* estat_client, Configuracio* configuracio) {
             params->estat_client = estat_client;
             params->configuracio = configuracio;
             if (pthread_create(&thread_comandes, NULL, (void* (*)(void*)) espera_comandes, (void*) (params))) {
-                fprintf(stderr, "Error creant thread\n");
+                fprintf(stderr, "SEVERE => Error creant thread\n");
                 return -1;
             }
         }
@@ -123,13 +123,13 @@ int mantenir_comunicacio(Estat* estat_client, Configuracio* configuracio) {
         }
         if (perduts == R) {
             estat_client->estat = NOT_SUBSCRIBED;
-            printf("El client passa a estat NOT_SUBSCRIBED\n");
+            printf("INFO => El client passa a estat NOT_SUBSCRIBED\n");
             break;
         }
         asynchronous_read_mantenir_comunicacio(estat_client, socket_client, configuracio, pdu, &read_set, result);
     }
     if (pthread_join(thread_comandes, NULL)) {
-        fprintf(stderr, "Error join thread\n");
+        fprintf(stderr, "SEVERE => Error join thread\n");
         return -1;
     }
     return 0;
@@ -140,12 +140,12 @@ void envia_mantenir_comunicacio(Estat* estat_client, Socket_client* socket_clien
     int bytes = sendto(socket_client->fd, pdu, sizeof (PDU_comunicacio), 0,
             (struct sockaddr*) &(socket_client->server), sizeof (struct sockaddr));
     if(estat_client->debug == 1){
-        printf("Envia => tipus paquet : %c , mac : %s , numero aleatori : %s , dades : %s\n",
+        printf("DEBUG => Envia { tipus paquet : %c , mac : %s , numero aleatori : %s , dades : %s }\n",
                 pdu->tipus_paquet, pdu->mac, pdu->numero_aleatori, pdu->dades);
     }
     if (bytes == -1) {
 
-        fprintf(stderr, "sendto() error\n");
+        fprintf(stderr, "SEVERE => sendto() error\n");
     }
 }
 
@@ -158,7 +158,7 @@ void asynchronous_read_mantenir_comunicacio(Estat* estat_client,
         }
     } else if (result < 0) {
 
-        fprintf(stderr, "Error al select() \n");
+        fprintf(stderr, "SEVERE => Error al select() \n");
     }
 }
 
@@ -168,12 +168,12 @@ void rep_resposta_mantenir_comunicacio(Estat* estat_client,
     int bytes = recvfrom(socket_client->fd, pdu, sizeof (PDU_comunicacio),
             0, (struct sockaddr*) &(socket_client->server), &socklen);
     if(estat_client->debug == 1){
-        printf("Rep => tipus paquet : %c , mac : %s , numero aleatori : %s , dades : %s\n",
+        printf("DEBUG => Rep { tipus paquet : %c , mac : %s , numero aleatori : %s , dades : %s }\n",
                 pdu->tipus_paquet, pdu->mac, pdu->numero_aleatori, pdu->dades);
     }
     if (bytes == -1) {
 
-        fprintf(stderr, "recvfrom() error\n");
+        fprintf(stderr, "SEVERE => recvfrom() error\n");
     }
     comprova_resposta_mantenir_comunicacio(estat_client, configuracio, socket_client, pdu);
 }
@@ -186,7 +186,7 @@ void comprova_resposta_mantenir_comunicacio(Estat* estat_client,
         if (comprova_dades_mantenir_comunicacio(estat_client, configuracio, socket_client, pdu) == 0 &&
                 strcmp(pdu->dades, dades) == 0) {
             if(estat_client->estat != SEND_HELLO){
-                printf("El client passa a estat SEND_HELLO\n");
+                printf("INFO => El client passa a estat SEND_HELLO\n");
             }
             estat_client->estat = SEND_HELLO;
         }

@@ -48,7 +48,9 @@ void stat(Configuracio* configuracio) {
     printf("Situacio : %s\n", configuracio->situation);
     int i;
     for (i = 0; i < 10; i++) {
-        printf("Element %i : %s\n", i, configuracio->elements[i].codi);
+        printf("Element %i : { codi = %s , valor = %i }\n", i,
+                strlen(configuracio->elements[i].codi) == 0 ? "No assignat" : configuracio->elements[i].codi,
+                configuracio->elements[i].valor);
     }
 }
 
@@ -56,14 +58,11 @@ void set(char* commanda, Configuracio* configuracio) {
     char dispositiu[20];
     char valor[20];
     sscanf(commanda, "set %s %s\n", dispositiu, valor);
-    if (strlen(valor) == 1 && strlen(dispositiu) == 3) {
-        int i;
-        for (i = 0; i<sizeof (configuracio->elements) / sizeof (Element); i++) {
-            if (strncmp(dispositiu, configuracio->elements[i].codi, strlen(dispositiu)) == 0
-                    && configuracio->elements[i].codi[strlen(configuracio->elements[i].codi) - 1] == 'I') {
-                sprintf(configuracio->elements[i].codi, "%s-%i-I", dispositiu, atoi(valor));
-                break;
-            }
+    int i;
+    for (i = 0; i<sizeof (configuracio->elements) / sizeof (Element); i++) {
+        if (strcmp(dispositiu, configuracio->elements[i].codi) == 0) {
+            configuracio->elements[i].valor = atoi(valor);
+            break;
         }
     }
 }

@@ -34,19 +34,19 @@ int main(int argc, char** argv) {
     estat_client->debug = 0;
     // Entren els arguments
     if (parse_args(argc, argv, arguments, configuracio,estat_client) == -1) {
-        fprintf(stderr, "Error inesperat\n");
+        fprintf(stderr, "SEVERE => Error inesperat\n");
         return (EXIT_FAILURE);
     }
     while (1) {
         // fase de registre
         if (subscripcio(estat_client, configuracio) == -1) {
-            fprintf(stderr, "Error inesperat\n");
+            fprintf(stderr, "SEVERE => Error inesperat\n");
             return (EXIT_FAILURE);
         }
         // fase mantenir comunicacio
         if (estat_client->estat == SUBSCRIBED) {
             if(mantenir_comunicacio(estat_client,configuracio) == -1){
-                fprintf(stderr,"Error inesperat\n");
+                fprintf(stderr,"SEVERE => Error inesperat\n");
                 return(EXIT_FAILURE);
             }
         }

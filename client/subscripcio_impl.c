@@ -27,7 +27,7 @@
 
 int subscripcio(Estat* estat_client, Configuracio* configuracio) {
     estat_client->estat = DISCONNECTED;
-    printf("El client passa al estat DISCONNECTED\n");
+    printf("INFO => El client passa a estat DISCONNECTED\n");
     Socket_client* socket_client = (Socket_client*) malloc(sizeof (Socket_client));
     if (start_socket(socket_client, configuracio) == -1) {
         return -1;
@@ -41,7 +41,7 @@ int subscripcio(Estat* estat_client, Configuracio* configuracio) {
     // envia el paquet
     envia(estat_client, socket_client, pdu);
     estat_client->estat = WAIT_ACK_SUBS;
-    printf("El client passa al estat WAIT_ACK_SUBS\n");
+    printf("INFO => El client passa a estat WAIT_ACK_SUBS\n");
 
     fd_set read_set;
     FD_ZERO(&read_set);
@@ -96,7 +96,7 @@ int subscripcio(Estat* estat_client, Configuracio* configuracio) {
     }
     close(socket_client->fd);
     if(j == O){
-        fprintf(stderr,"No s'ha pogut establir connexio amb el servidor\n");
+        fprintf(stderr,"SEVERE => No s'ha pogut establir connexio amb el servidor\n");
         exit(EXIT_FAILURE);
     }
     return 0;
@@ -105,12 +105,12 @@ int subscripcio(Estat* estat_client, Configuracio* configuracio) {
 int start_socket(Socket_client* socket_client, Configuracio* configuracio) {
     socket_client->he = gethostbyname(configuracio->server);
     if (socket_client->he == NULL) {
-        fprintf(stderr, "gethostbyname() error\n");
+        fprintf(stderr, "SEVERE => gethostbyname() error\n");
         return -1;
     }
     socket_client->fd = socket(AF_INET, SOCK_DGRAM, 0);
     if (socket_client->fd == -1) {
-        fprintf(stderr, "socket() error\n");
+        fprintf(stderr, "SEVERE => socket() error\n");
         return -1;
     }
     socket_client->server.sin_family = AF_INET;
@@ -131,11 +131,11 @@ void envia(Estat* estat_client, Socket_client* socket_client, PDU* pdu) {
     int bytes = sendto(socket_client->fd, pdu, sizeof (PDU), 0,
             (struct sockaddr*) &(socket_client->server), sizeof (struct sockaddr));
     if(estat_client->debug == 1){
-        printf("Envia => tipus paquet : %c , mac : %s , numero aleatori : %s , dades : %s\n",
+        printf("DEBUG => Envia { tipus paquet : %c , mac : %s , numero aleatori : %s , dades : %s }|n",
                 pdu->tipus_paquet, pdu->mac, pdu->numero_aleatori, pdu->dades);
     }
     if (bytes == -1) {
-        fprintf(stderr, "sendto() error\n");
+        fprintf(stderr, "SEVERE => sendto() error\n");
     }
 }
 
@@ -143,11 +143,11 @@ void rep_resposta(Estat* estat_client, Configuracio* configuracio, Socket_client
     socklen_t socklen = sizeof (struct sockaddr);
     int bytes = recvfrom(socket_client->fd, pdu, sizeof (PDU), 0, (struct sockaddr*) &(socket_client->server), &socklen);
     if(estat_client->debug == 1){
-        printf("Rep => tipus paquet : %c , mac : %s , numero aleatori : %s , dades : %s\n",
+        printf("DEBUG => Rep { tipus paquet : %c , mac : %s , numero aleatori : %s , dades : %s }\n",
                 pdu->tipus_paquet, pdu->mac, pdu->numero_aleatori, pdu->dades);
     }
     if (bytes == -1) {
-        fprintf(stderr, "recvfrom() error\n");
+        fprintf(stderr, "SEVERE => recvfrom() error\n");
     }
     comprova_resposta(estat_client, configuracio, socket_client, pdu);
 }
@@ -172,25 +172,25 @@ void comprova_resposta(Estat* estat_client, Configuracio* configuracio, Socket_c
         socket_client->server.sin_port = htons(configuracio->dades_servidor.udp_port);
         envia(estat_client, socket_client, pdu);
         estat_client->estat = WAIT_ACK_INFO;
-        printf("El client passa a estat WAIT_ACK_INFO\n");
+        printf("INFO => El client passa al estat WAIT_ACK_INFO\n");
     } else if (pdu->tipus_paquet == SUBS_NACK || pdu->tipus_paquet == SUBS_REJ) {
         estat_client->estat = NOT_SUBSCRIBED;
-        printf("El client passa a estat NOT_SUBSCRIBED\n");
-        fprintf(stderr,"El servidor ha rebutjat la conexio\n");
+        printf("INFO => El client passa a estat NOT_SUBSCRIBED\n");
+        fprintf(stderr,"SEVERE => El servidor ha rebutjat la conexio\n");
         exit(EXIT_FAILURE);
     } else if (pdu->tipus_paquet == INFO_ACK && estat_client->estat == WAIT_ACK_INFO) {
         if (comprova_dades(estat_client, configuracio, socket_client, pdu) == 0) {
             estat_client->estat = SUBSCRIBED;
-            printf("El client passa a estat SUBSCRIBED\n");
+            printf("INFO => El client passa a estat SUBSCRIBED\n");
         } else {
             estat_client->estat = NOT_SUBSCRIBED;
-            printf("El client passa a estat NOT_SUBSCRIBED\n");
-            fprintf(stderr,"Les dades no han pogut estar validades\n");
+            printf("INFO => El client passa a estat NOT_SUBSCRIBED\n");
+            fprintf(stderr,"SEVERE => Les dades no han pogut estar validades\n");
             exit(EXIT_FAILURE);
         }
     } else {
         estat_client->estat = NOT_SUBSCRIBED;
-        printf("El client passa a estat NOT_SUBSCRIBED\n");
+        printf("INFO => El client passa a estat NOT_SUBSCRIBED\n");
     }
 }
 
@@ -214,6 +214,6 @@ void asynchronous_read(Estat* estat_client, Socket_client* socket_client, Config
             rep_resposta(estat_client, configuration, socket_client, pdu);
         }
     } else if (result < 0) {
-        fprintf(stderr, "Error al select() \n");
+        fprintf(stderr, "SEVERE => Error al select() \n");
     }
 }
