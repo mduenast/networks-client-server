@@ -131,7 +131,7 @@ void envia(Estat* estat_client, Socket_client* socket_client, PDU* pdu) {
     int bytes = sendto(socket_client->fd, pdu, sizeof (PDU), 0,
             (struct sockaddr*) &(socket_client->server), sizeof (struct sockaddr));
     if(estat_client->debug == 1){
-        printf("DEBUG => Envia { tipus paquet : %c , mac : %s , numero aleatori : %s , dades : %s }|n",
+        printf("DEBUG => Envia { tipus paquet : %c , mac : %s , numero aleatori : %s , dades : %s }\n",
                 pdu->tipus_paquet, pdu->mac, pdu->numero_aleatori, pdu->dades);
     }
     if (bytes == -1) {
@@ -180,6 +180,7 @@ void comprova_resposta(Estat* estat_client, Configuracio* configuracio, Socket_c
         exit(EXIT_FAILURE);
     } else if (pdu->tipus_paquet == INFO_ACK && estat_client->estat == WAIT_ACK_INFO) {
         if (comprova_dades(estat_client, configuracio, socket_client, pdu) == 0) {
+            configuracio->tcp_enviar_rebre_dades = atoi(pdu->dades);
             estat_client->estat = SUBSCRIBED;
             printf("INFO => El client passa a estat SUBSCRIBED\n");
         } else {

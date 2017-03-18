@@ -48,6 +48,7 @@ typedef struct configuracio {
     int local_tcp;
     char server[20];
     int srv_udp;
+    int tcp_enviar_rebre_dades;
     Dades_servidor dades_servidor;
 } Configuracio;
 

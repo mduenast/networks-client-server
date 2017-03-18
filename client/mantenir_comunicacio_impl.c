@@ -81,13 +81,14 @@ int mantenir_comunicacio(Estat* estat_client, Configuracio* configuracio) {
 
     // envia el paquet
     envia_mantenir_comunicacio(estat_client, socket_client, pdu);
-
+    
     fd_set read_set;
     FD_ZERO(&read_set);
     FD_SET(socket_client->fd, &read_set);
 
     struct timeval time_out;
     time_out.tv_sec = 0;
+    sleep(V);
     int result = select(socket_client->fd + 1, &read_set, NULL, NULL, &time_out);
     asynchronous_read_mantenir_comunicacio(estat_client, socket_client, configuracio, pdu, &read_set, result);
 

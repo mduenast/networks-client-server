@@ -92,12 +92,12 @@ int comandes(Estat* estat_client, Configuracio* configuracio) {
                     } else if (strcmp("\n", commanda) == 0) {
 
                     } else {
-                        fprintf(stderr, "No es reconeix la commanda\n");
+                        fprintf(stderr,"No es reconeix la commanda\n");
                     }
                 }
             }
         } else if (result < 0) {
-            fprintf(stderr, "Error al select() \n");
+            fprintf(stderr, "SEVERE => Error al select() \n");
         }
     }
     return 0;
