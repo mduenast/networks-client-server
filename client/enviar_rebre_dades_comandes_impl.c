@@ -34,12 +34,50 @@
 #include <netdb.h>
 #include <arpa/inet.h>
 
+#include <pthread.h>
+
+#define BACKLOG (int) 1
+
 void* espera_comandes(void* params) {
     Parametres* parametres = (Parametres*) params;
+    
     if (comandes(parametres->estat_client, parametres->configuracio) == -1) {
         fprintf(stderr, "Hi ha hagut un error inesperat\n");
-        exit(EXIT_FAILURE);
+        return NULL;
     }
+    
+    return NULL;
+}
+
+void* rebre_dades(void* params) {
+    Parametres* parametres = (Parametres*) params;
+    int sin_size;
+    Socket_client_rebre_dades* socket_client = (Socket_client_rebre_dades*)
+            malloc(sizeof (Socket_client_rebre_dades));
+    if (inicia_socket_tcp_rebre(parametres->configuracio, socket_client) == -1) {
+        fprintf(stderr, "SEVERE => Error al obrir el socket\n");
+        return NULL;
+    }
+    while (parametres->estat_client->estat == SEND_HELLO) {
+        sin_size = sizeof (struct sockaddr_in);
+        /* A continuación la llamada a accept() */
+        /*if ((socket_client->fd_client = accept(socket_client->fd_server, (struct sockaddr *) &(socket_client->client),
+                &sin_size)) == -1) {
+            printf("SEVERE => error en accept()\n");
+            return NULL;
+        }*/
+
+        /*printf("INFO => S'ha obtingut una connexio desde => %s\n",
+                inet_ntoa((socket_client->client).sin_addr));*/
+        /* que mostrará la IP del cliente */
+
+
+
+        //close(socket_client->fd_client); /* cierra fd2 */
+    }
+    close(socket_client->fd_server);
+    //close(socket_client->fd_client); /* cierra fd2 */
+    printf("fin");
     return NULL;
 }
 
@@ -124,7 +162,7 @@ int envia_dades(char* commanda, Configuracio* configuracio, Estat* estat_client)
                     if (comprova_dades_enviar_dades(estat_client, configuracio, socket, pdu) == 0) {
                         if (pdu->tipus_paquet == DATA_ACK) {
                             printf("INFO => Les dades han estat acceptades\n");
-                        }else if(pdu->tipus_paquet == DATA_NACK) {
+                        } else if (pdu->tipus_paquet == DATA_NACK) {
                             printf("INFO => Les dades no han estat acceptades\n");
                         } else if (pdu->tipus_paquet == DATA_REJ) {
                             printf("INFO => Les dades han sigut rebutjades\n");
@@ -143,6 +181,7 @@ int envia_dades(char* commanda, Configuracio* configuracio, Estat* estat_client)
             }
         }
     }
+    close(socket->fd);
     return 0;
 }
 
@@ -232,6 +271,35 @@ int comprova_dades_enviar_dades(Estat* estat_client,
         return -1;
     }
     if (strcmp(configuracio->dades_servidor.numero_aleatori, pdu->numero_aleatori) != 0) {
+        return -1;
+    }
+    return 0;
+}
+
+int inicia_socket_tcp_rebre(Configuracio* configuracio, Socket_client_rebre_dades* socket_client) {
+    if ((socket_client->fd_server = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+        printf("SEVERE => error en socket()\n");
+        return -1;
+    }
+
+    socket_client->server.sin_family = AF_INET;
+
+    socket_client->server.sin_port = htons(configuracio->local_tcp);
+    /* ¿Recuerdas a htons() de la sección "Conversiones"? =) */
+
+    socket_client->server.sin_addr.s_addr = INADDR_ANY;
+    /* INADDR_ANY coloca nuestra dirección IP automáticamente */
+
+    memset(&(socket_client->server.sin_zero), 0, 8);
+    /* A continuación la llamada a bind() */
+    if (bind(socket_client->fd_server, (struct sockaddr*) &(socket_client->server),
+            sizeof (struct sockaddr)) == -1) {
+        printf("SEVERE => error en bind() \n");
+        return -1;
+    }
+    /* llamada a listen() */
+    if (listen(socket_client->fd_server, BACKLOG) == -1) {
+        printf("SEVERE => error en listen()\n");
         return -1;
     }
     return 0;

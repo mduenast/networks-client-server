@@ -45,8 +45,9 @@ typedef struct socket_client_enviar_dades {
 } Socket_client_enviar_dades;
 
 typedef struct socket_client_rebre_dades {
-    int fd;
-    struct hostent *he;
+    int fd_client;
+    int fd_server;
+    struct sockaddr_in client;
     struct sockaddr_in server;
 } Socket_client_rebre_dades;
 

@@ -47,6 +47,8 @@ typedef struct parametres{
     Estat* estat_client;
 }Parametres;
 
+int inicia_socket_tcp_rebre(Configuracio* configuracio, Socket_client_rebre_dades* socket_client);
+void* rebre_dades(void* params);
 int comprova_dades_enviar_dades(Estat* estat_client,
         Configuracio* configuracio, Socket_client_enviar_dades* socket_client_enviar_dades, 
         PDU_Enviar_dades* pdu);
