@@ -27,6 +27,12 @@
 #include <sys/select.h>
 #include <sys/time.h>
 #include <sys/types.h>
+#include <string.h>
+
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#include <arpa/inet.h>
 
 void* espera_comandes(void* params) {
     Parametres* parametres = (Parametres*) params;
@@ -43,15 +49,19 @@ void quit() {
 }
 
 void stat(Configuracio* configuracio) {
-    printf("MAC : %s\n", configuracio->mac);
-    printf("Nom : %s\n", configuracio->name);
-    printf("Situacio : %s\n", configuracio->situation);
+    printf("+--------------+\n");
+    printf("|     stat     |\n");
+    printf("+--------------+\n");
+    printf("* MAC : %s\n", configuracio->mac);
+    printf("* Nom : %s\n", configuracio->name);
+    printf("* Situacio : %s\n", configuracio->situation);
     int i;
     for (i = 0; i < 10; i++) {
-        printf("Element %i : { codi = %s , valor = %i }\n", i,
+        printf("* Element %i : { codi = %s , valor = %s }\n", i,
                 strlen(configuracio->elements[i].codi) == 0 ? "No assignat" : configuracio->elements[i].codi,
                 configuracio->elements[i].valor);
     }
+    printf("*********************************************\n");
 }
 
 void set(char* commanda, Configuracio* configuracio) {
@@ -61,17 +71,82 @@ void set(char* commanda, Configuracio* configuracio) {
     int i;
     for (i = 0; i<sizeof (configuracio->elements) / sizeof (Element); i++) {
         if (strcmp(dispositiu, configuracio->elements[i].codi) == 0) {
-            configuracio->elements[i].valor = atoi(valor);
+            strcpy(configuracio->elements[i].valor, valor);
             break;
         }
     }
 }
 
-/*int send(char* nom_dispositiu,Configuracio* configuracio){
-    return 0;
-}*/
+int envia_dades(char* commanda, Configuracio* configuracio, Estat* estat_client) {
+    char nom_dispositiu[20];
+    sscanf(commanda, "send %s\n", nom_dispositiu);
+    Socket_client_enviar_dades* socket = (Socket_client_enviar_dades*)
+            malloc(sizeof (Socket_client_enviar_dades));
+    if (inicia_socket_tcp_send(configuracio, socket) == -1) {
+        fprintf(stderr, "SEVERE => Error al obrir el socket\n");
+        return -1;
+    }
+    int i;
+    for (i = 0; i < (sizeof (configuracio->elements)) / (sizeof (Element)); i++) {
+        if (strcmp(configuracio->elements[i].codi, nom_dispositiu) == 0) {
+            PDU_Enviar_dades* pdu = (PDU_Enviar_dades*) malloc(sizeof (PDU_Enviar_dades));
+            prepara_pdu_enviar_dades(pdu, SEND_DATA, configuracio->mac,
+                    configuracio->dades_servidor.numero_aleatori, nom_dispositiu,
+                    configuracio->elements[i].valor, "");
+            if (estat_client->debug == 1) {
+                printf("DEBUG => Enviant { Dispositiu = %s , valor = %s }\n",
+                        nom_dispositiu, configuracio->elements[i].valor);
+            }
+            int bytes = send(socket->fd, pdu, sizeof (PDU_Enviar_dades), 0);
+            if (bytes == -1) {
+                fprintf(stderr, "SEVERE => send()\n");
+                return -1;
+            }
+            fd_set read_set;
+            FD_ZERO(&read_set);
+            FD_SET(socket->fd, &read_set);
+            struct timeval time_out;
+            time_out.tv_sec = W;
 
-int comandes(Estat* estat_client, Configuracio* configuracio) {
+            int result = select(socket->fd + 1, &read_set, NULL, NULL, &time_out);
+            if (result > 0) {
+                if (FD_ISSET(socket->fd, &read_set)) {
+                    bytes = recv(socket->fd, pdu, sizeof (PDU_Enviar_dades), 0);
+                    if (estat_client->debug == 1) {
+                        printf("Rebut {tipus paquet = %u , mac = %s , numero aleatori = %s , "
+                                "dispositiu = %s , valor = %s , info = %s }\n",
+                                pdu->tipus_paquet, pdu->numero_aleatori, pdu->numero_aleatori,
+                                pdu->dispositiu, pdu->valor, pdu->info);
+                    }
+                    if (bytes == -1) {
+                        fprintf(stderr, "SEVERE => recvfrom() error\n");
+                    }
+                    if (comprova_dades_enviar_dades(estat_client, configuracio, socket, pdu) == 0) {
+                        if (pdu->tipus_paquet == DATA_ACK) {
+                            printf("INFO => Les dades han estat acceptades\n");
+                        }else if(pdu->tipus_paquet == DATA_NACK) {
+                            printf("INFO => Les dades no han estat acceptades\n");
+                        } else if (pdu->tipus_paquet == DATA_REJ) {
+                            printf("INFO => Les dades han sigut rebutjades\n");
+                            estat_client->estat = NOT_SUBSCRIBED;
+                            printf("INFO => El client passa a estat NOT_SUBSCRIBED\n");
+                            return -1;
+                        }
+                    } else {
+                        estat_client->estat = NOT_SUBSCRIBED;
+                        printf("INFO => El client passa a estat NOT_SUBSCRIBED\n");
+                        return -1;
+                    }
+                }
+            } else if (result < 0) {
+                fprintf(stderr, "SEVERE => Error al select() \n");
+            }
+        }
+    }
+    return 0;
+}
+
+int comandes(Estat* estat_client, Configuracio * configuracio) {
     fd_set read_set;
     FD_ZERO(&read_set);
     FD_SET(0, &read_set);
@@ -93,10 +168,14 @@ int comandes(Estat* estat_client, Configuracio* configuracio) {
                         stat(configuracio);
                     } else if (strncmp("set", commanda, strlen("set")) == 0) {
                         set(commanda, configuracio);
+                    } else if (strncmp("send", commanda, strlen("send")) == 0) {
+                        if (envia_dades(commanda, configuracio, estat_client) == -1) {
+                            return -1;
+                        }
                     } else if (strcmp("\n", commanda) == 0) {
 
                     } else {
-                        fprintf(stderr,"No es reconeix la commanda\n");
+                        fprintf(stderr, "No es reconeix la commanda\n");
                     }
                 }
             }
@@ -107,3 +186,53 @@ int comandes(Estat* estat_client, Configuracio* configuracio) {
     return 0;
 }
 
+int inicia_socket_tcp_send(Configuracio* configuracio, Socket_client_enviar_dades * socket_enviar) {
+    if ((socket_enviar->he = gethostbyname(configuracio->server)) == NULL) {
+        /* llamada a gethostbyname() */
+        printf("SEVERE => gethostbyname()\n");
+        return -1;
+    }
+
+    if ((socket_enviar->fd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+        /* llamada a socket() */
+        printf("SEVERE => socket()\n");
+        return -1;
+    }
+    socket_enviar->server.sin_family = AF_INET;
+    socket_enviar->server.sin_port = htons(configuracio->tcp_enviar_rebre_dades);
+    socket_enviar->server.sin_addr = *((struct in_addr *) socket_enviar->he->h_addr_list[0]);
+    memset(&(socket_enviar->server.sin_zero), 0, 8);
+
+    if (connect(socket_enviar->fd, (struct sockaddr *) &(socket_enviar->server),
+            sizeof (struct sockaddr)) == -1) {
+        /* llamada a connect() */
+        printf("SEVERE => connect()\n");
+        return -1;
+    }
+    return 0;
+}
+
+void prepara_pdu_enviar_dades(PDU_Enviar_dades* pdu, unsigned char tipus_paquet,
+        char* mac, char* numero_aleatori, char* dispositiu, char* valor, char* info) {
+    pdu->tipus_paquet = tipus_paquet;
+    strcpy(pdu->mac, mac);
+    strcpy(pdu->numero_aleatori, numero_aleatori);
+    strcpy(pdu->dispositiu, dispositiu);
+    strcpy(pdu->valor, valor);
+    strcpy(pdu->info, info);
+}
+
+int comprova_dades_enviar_dades(Estat* estat_client,
+        Configuracio* configuracio, Socket_client_enviar_dades* socket_client_enviar_dades,
+        PDU_Enviar_dades * pdu) {
+    if (strcmp(configuracio->dades_servidor.ip, inet_ntoa(socket_client_enviar_dades->server.sin_addr)) != 0) {
+        return -1;
+    }
+    if (strcmp(configuracio->dades_servidor.mac, pdu->mac) != 0) {
+        return -1;
+    }
+    if (strcmp(configuracio->dades_servidor.numero_aleatori, pdu->numero_aleatori) != 0) {
+        return -1;
+    }
+    return 0;
+}

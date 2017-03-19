@@ -30,7 +30,7 @@ void get_elements(char* value, Configuracio* configuracio) {
         if (i < 10) {
             strcpy(configuracio->elements[i].codi, token);
             //valor per defecte
-            configuracio->elements[i].valor = 0; 
+            sprintf(configuracio->elements[i].valor,"%i",0); 
             token = strtok(NULL, ";");
         }
         i++;

@@ -30,7 +30,7 @@ typedef struct arguments {
 
 typedef struct element {
     char codi[7 + 1];
-    int valor;
+    char valor[7];
 } Element;
 
 typedef struct dades_servidor{

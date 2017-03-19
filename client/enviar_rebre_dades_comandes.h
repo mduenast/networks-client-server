@@ -20,6 +20,7 @@
 
 #include "arguments.h"
 #include "estat_client.h"
+#include "socket_client.h"
 #include <pthread.h>
 
 
@@ -46,6 +47,13 @@ typedef struct parametres{
     Estat* estat_client;
 }Parametres;
 
+int comprova_dades_enviar_dades(Estat* estat_client,
+        Configuracio* configuracio, Socket_client_enviar_dades* socket_client_enviar_dades, 
+        PDU_Enviar_dades* pdu);
+void prepara_pdu_enviar_dades(PDU_Enviar_dades* pdu,unsigned char tipus_paquet,
+        char* mac,char* numero_aleatori,char* dispositiu,char* valor,char* info);
+int inicia_socket_tcp_send(Configuracio* configuracio, Socket_client_enviar_dades* socket);
+int envia_dades(char* commanda,Configuracio* configuracio,Estat* estat_client);
 void quit();
 void stat(Configuracio* configuracio);
 void set(char* commanda,Configuracio* configuracio);
