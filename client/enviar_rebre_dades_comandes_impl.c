@@ -40,12 +40,12 @@
 
 void* espera_comandes(void* params) {
     Parametres* parametres = (Parametres*) params;
-    
+
     if (comandes(parametres->estat_client, parametres->configuracio) == -1) {
         fprintf(stderr, "Hi ha hagut un error inesperat\n");
         return NULL;
     }
-    
+
     return NULL;
 }
 
@@ -58,26 +58,39 @@ void* rebre_dades(void* params) {
         fprintf(stderr, "SEVERE => Error al obrir el socket\n");
         return NULL;
     }
+
+    fd_set read_set;
+    FD_ZERO(&read_set);
+    FD_SET(socket_client->fd_server, &read_set);
+    struct timeval time_out;
+    time_out.tv_sec = 0;
     while (parametres->estat_client->estat == SEND_HELLO) {
+
+        FD_ZERO(&read_set);
+        FD_SET(socket_client->fd_server, &read_set);
+
         sin_size = sizeof (struct sockaddr_in);
-        /* A continuación la llamada a accept() */
-        /*if ((socket_client->fd_client = accept(socket_client->fd_server, (struct sockaddr *) &(socket_client->client),
-                &sin_size)) == -1) {
-            printf("SEVERE => error en accept()\n");
-            return NULL;
-        }*/
+        int result = select(socket_client->fd_server + 1, &read_set, NULL, NULL, &time_out);
+        if (result > 0) {
+            if (FD_ISSET(socket_client->fd_server, &read_set)) {
+                /* A continuación la llamada a accept() */
 
-        /*printf("INFO => S'ha obtingut una connexio desde => %s\n",
-                inet_ntoa((socket_client->client).sin_addr));*/
-        /* que mostrará la IP del cliente */
-
-
-
+                if ((socket_client->fd_client = accept(socket_client->fd_server, (struct sockaddr *) &(socket_client->client),
+                        &sin_size)) == -1) {
+                    printf("SEVERE => error en accept()\n");
+                    return NULL;
+                }
+                printf("INFO => S'ha obtingut una connexio desde => %s\n",
+                        inet_ntoa((socket_client->client).sin_addr));
+                /* que mostrará la IP del cliente */
+            }
+        } else if (result < 0) {
+            fprintf(stderr, "SEVERE => Error al select() \n");
+        }
         //close(socket_client->fd_client); /* cierra fd2 */
     }
     close(socket_client->fd_server);
-    //close(socket_client->fd_client); /* cierra fd2 */
-    printf("fin");
+    close(socket_client->fd_client); /* cierra fd2 */
     return NULL;
 }
 

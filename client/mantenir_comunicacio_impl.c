@@ -145,20 +145,16 @@ int mantenir_comunicacio(Estat* estat_client, Configuracio* configuracio) {
             close(socket_client->fd);
             break;
         }
-        printf("1-----1");
         asynchronous_read_mantenir_comunicacio(estat_client, socket_client, configuracio, pdu, &read_set, result);
     }
-    printf("2-----2");
     if (pthread_join(thread_comandes, NULL)) {
         fprintf(stderr, "SEVERE => Error join thread\n");
         return -1;
     }
-    printf("3------3");
     if (pthread_join(thread_rebre_dades, NULL)) {
         fprintf(stderr, "SEVERE => Error join thread\n");
         return -1;
     }
-    printf("4-------4");
     return 0;
 }
 
