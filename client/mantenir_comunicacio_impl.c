@@ -117,10 +117,15 @@ int mantenir_comunicacio(Estat* estat_client, Configuracio* configuracio) {
                 fprintf(stderr, "SEVERE => Error creant thread\n");
                 return -1;
             }
-            
+            if(estat_client->debug == 1){
+                printf("DEBUG => Comença el fil de rebre commandes\n");
+            }
             if (pthread_create(&thread_rebre_dades,NULL, (void* (*)(void*)) rebre_dades, (void*) (params))) {
                 fprintf(stderr, "SEVERE => Error creant thread\n");
                 return -1;
+            }
+            if(estat_client->debug == 1){
+                printf("DEBUG => Comença el fil de rebre dades del servidor\n");
             }
         }
 
@@ -151,9 +156,15 @@ int mantenir_comunicacio(Estat* estat_client, Configuracio* configuracio) {
         fprintf(stderr, "SEVERE => Error join thread\n");
         return -1;
     }
+    if(estat_client->debug == 1){
+        printf("DEBUG => Finalitza el fil de espera commandes\n");
+    }
     if (pthread_join(thread_rebre_dades, NULL)) {
         fprintf(stderr, "SEVERE => Error join thread\n");
         return -1;
+    }
+    if(estat_client->debug == 1){
+        printf("DEBUG => FInalitza el fil de rebre dades del servidor\n");
     }
     return 0;
 }

@@ -33,6 +33,15 @@ typedef struct pdu_enviar_dades{
     char info[80];
 }PDU_Enviar_dades;
 
+typedef struct pdu_rebre_dades{
+    unsigned char tipus_paquet;
+    char mac[13];
+    char numero_aleatori[9];
+    char dispositiu[8];
+    char valor[7];
+    char info[80];
+}PDU_Rebre_dades;
+
 #define SEND_DATA (int) 0x20
 #define SET_DATA (int) 0x21
 #define GET_DATA (int) 0x22
@@ -47,6 +56,11 @@ typedef struct parametres{
     Estat* estat_client;
 }Parametres;
 
+int comprova_dades_rebre_dades(Estat* estat_client,
+        Configuracio* configuracio, Socket_client_rebre_dades* socket_client_rebre_dades,
+        PDU_Rebre_dades * pdu);
+void prepara_pdu_rebre_dades(PDU_Rebre_dades* pdu, unsigned char tipus_paquet,
+        char* mac, char* numero_aleatori, char* dispositiu, char* valor, char* info);
 int inicia_socket_tcp_rebre(Configuracio* configuracio, Socket_client_rebre_dades* socket_client);
 void* rebre_dades(void* params);
 int comprova_dades_enviar_dades(Estat* estat_client,

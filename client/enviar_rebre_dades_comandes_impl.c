@@ -83,9 +83,26 @@ void* rebre_dades(void* params) {
                 printf("INFO => S'ha obtingut una connexio desde => %s\n",
                         inet_ntoa((socket_client->client).sin_addr));
                 /* que mostrará la IP del cliente */
+                int bytes = 0;
+                PDU_Rebre_dades* pdu = (PDU_Rebre_dades*) malloc(sizeof (PDU_Rebre_dades));
+                if ((bytes = recv(socket_client->fd_client, pdu, sizeof (PDU_Rebre_dades), 0)) == -1) {
+                    /* llamada a recv() */
+                    printf("SEVERE => Error al recv()\n");
+                    return NULL;
+                }
+                if (parametres->estat_client->debug == 1) {
+                    printf("DEBUG => Rebut { tipus paquet = %u , mac = %s , numero aleatori = %s ,"
+                            " dispositiu = %s , valor = %s , info = %s }\n", pdu->tipus_paquet, pdu->mac, pdu->numero_aleatori, pdu->dispositiu,
+                            pdu->valor, pdu->info);
+                }
+                if (comprova_dades_rebre_dades(parametres->estat_client, parametres->configuracio, socket_client, pdu) == 0) {
+                    printf("VALIDAT\n");
+                } else {
+                    printf("NO VALIDAT\n");
+                }
             }
         } else if (result < 0) {
-            fprintf(stderr, "SEVERE => Error al select() \n");
+            fprintf(stderr, "SEVERE => Error al select()\n");
         }
         //close(socket_client->fd_client); /* cierra fd2 */
     }
@@ -274,6 +291,16 @@ void prepara_pdu_enviar_dades(PDU_Enviar_dades* pdu, unsigned char tipus_paquet,
     strcpy(pdu->info, info);
 }
 
+void prepara_pdu_rebre_dades(PDU_Rebre_dades* pdu, unsigned char tipus_paquet,
+        char* mac, char* numero_aleatori, char* dispositiu, char* valor, char* info) {
+    pdu->tipus_paquet = tipus_paquet;
+    strcpy(pdu->mac, mac);
+    strcpy(pdu->numero_aleatori, numero_aleatori);
+    strcpy(pdu->dispositiu, dispositiu);
+    strcpy(pdu->valor, valor);
+    strcpy(pdu->info, info);
+}
+
 int comprova_dades_enviar_dades(Estat* estat_client,
         Configuracio* configuracio, Socket_client_enviar_dades* socket_client_enviar_dades,
         PDU_Enviar_dades * pdu) {
@@ -284,6 +311,24 @@ int comprova_dades_enviar_dades(Estat* estat_client,
         return -1;
     }
     if (strcmp(configuracio->dades_servidor.numero_aleatori, pdu->numero_aleatori) != 0) {
+        return -1;
+    }
+    return 0;
+}
+
+int comprova_dades_rebre_dades(Estat* estat_client,
+        Configuracio* configuracio, Socket_client_rebre_dades* socket_client_rebre_dades,
+        PDU_Rebre_dades * pdu) {
+    if (strcmp(configuracio->dades_servidor.ip, inet_ntoa(socket_client_rebre_dades->client.sin_addr)) != 0) {
+        printf("falla la ip");
+        return -1;
+    }
+    if (strcmp(configuracio->dades_servidor.mac, pdu->mac) != 0) {
+        printf("fall la mac");
+        return -1;
+    }
+    if (strcmp(configuracio->dades_servidor.numero_aleatori, pdu->numero_aleatori) != 0) {
+        printf("falla el numero");
         return -1;
     }
     return 0;

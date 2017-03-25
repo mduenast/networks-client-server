@@ -29,6 +29,10 @@
 
 int main(int argc, char** argv) {
     Estat* estat_client = (Estat*) malloc(sizeof (Estat));
+    
+    estat_client->estat = DISCONNECTED;
+    printf("INFO => El client passa a estat DISCONNECTED\n");
+    
     Arguments* arguments = (Arguments*) malloc(sizeof (Arguments));
     Configuracio* configuracio = (Configuracio*) malloc(sizeof (Configuracio));
     estat_client->debug = 0;

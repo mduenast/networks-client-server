@@ -26,13 +26,10 @@
 #include <sys/types.h>
 
 int subscripcio(Estat* estat_client, Configuracio* configuracio) {
-    estat_client->estat = DISCONNECTED;
-    printf("INFO => El client passa a estat DISCONNECTED\n");
     Socket_client* socket_client = (Socket_client*) malloc(sizeof (Socket_client));
     if (start_socket(socket_client, configuracio) == -1) {
         return -1;
     }
-
     // prepara el paquet
     PDU* pdu = (PDU*) malloc(sizeof (PDU));
     char dades[80];
