@@ -143,7 +143,17 @@ void* rebre_dades(void* params) {
                                 }
                             }
                         } else {
-                            printf("NO VALIDAT\n");
+                            PDU_Rebre_dades* pdu_resposta = (PDU_Rebre_dades*) malloc(sizeof (PDU_Rebre_dades));
+                                prepara_pdu_rebre_dades(pdu_resposta, DATA_REJ, parametres->configuracio->mac,
+                                        parametres->configuracio->dades_servidor.numero_aleatori, pdu->dispositiu, pdu->valor, "Dades incorrectes");
+                                if ((bytes = send(socket_client->fd_client, pdu_resposta, sizeof (PDU_Rebre_dades), 0)) == -1) {
+                                    printf("SEVERE => Error al send()\n");
+                                }
+                                if (parametres->estat_client->debug == 1) {
+                                    printf("DEBUG => Enviat { tipus paquet = %u , mac = %s , numero aleatori = %s ,"
+                                            " dispositiu = %s , valor = %s , info = %s }\n", pdu_resposta->tipus_paquet, pdu_resposta->mac,
+                                            pdu_resposta->numero_aleatori, pdu_resposta->dispositiu, pdu_resposta->valor, pdu_resposta->info);
+                                }
                         }
                     }
                 } else if (result < 0) {
@@ -373,15 +383,12 @@ int comprova_dades_rebre_dades(Estat* estat_client,
         Configuracio* configuracio, Socket_client_rebre_dades* socket_client_rebre_dades,
         PDU_Rebre_dades * pdu) {
     if (strcmp(configuracio->dades_servidor.ip, inet_ntoa(socket_client_rebre_dades->client.sin_addr)) != 0) {
-        printf("falla la ip");
         return -1;
     }
     if (strcmp(configuracio->dades_servidor.mac, pdu->mac) != 0) {
-        printf("fall la mac");
         return -1;
     }
     if (strcmp(configuracio->dades_servidor.numero_aleatori, pdu->numero_aleatori) != 0) {
-        printf("falla el numero");
         return -1;
     }
     return 0;
