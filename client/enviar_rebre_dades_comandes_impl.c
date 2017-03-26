@@ -58,12 +58,13 @@ void* rebre_dades(void* params) {
         fprintf(stderr, "SEVERE => Error al obrir el socket\n");
         return NULL;
     }
-
+    socket_client->fd_client = -1;
     fd_set read_set;
     FD_ZERO(&read_set);
     FD_SET(socket_client->fd_server, &read_set);
     struct timeval time_out;
     time_out.tv_sec = 0;
+    time_out.tv_usec = 0;
     while (parametres->estat_client->estat == SEND_HELLO) {
 
         FD_ZERO(&read_set);
@@ -85,29 +86,79 @@ void* rebre_dades(void* params) {
                 /* que mostrará la IP del cliente */
                 int bytes = 0;
                 PDU_Rebre_dades* pdu = (PDU_Rebre_dades*) malloc(sizeof (PDU_Rebre_dades));
-                if ((bytes = recv(socket_client->fd_client, pdu, sizeof (PDU_Rebre_dades), 0)) == -1) {
-                    /* llamada a recv() */
-                    printf("SEVERE => Error al recv()\n");
-                    return NULL;
+
+                time_out.tv_sec = W;
+                FD_ZERO(&read_set);
+                FD_SET(socket_client->fd_client, &read_set);
+                result = select(socket_client->fd_client + 1, &read_set, NULL, NULL, &time_out);
+                if (result > 0) {
+                    if (FD_ISSET(socket_client->fd_client, &read_set)) {
+                        if ((bytes = recv(socket_client->fd_client, pdu, sizeof (PDU_Rebre_dades), 0)) == -1) {
+                            printf("SEVERE => Error al recv()\n");
+                            return NULL;
+                        }
+                        if (parametres->estat_client->debug == 1) {
+                            printf("DEBUG => Rebut { tipus paquet = %u , mac = %s , numero aleatori = %s ,"
+                                    " dispositiu = %s , valor = %s , info = %s }\n", pdu->tipus_paquet, pdu->mac, pdu->numero_aleatori, pdu->dispositiu,
+                                    pdu->valor, pdu->info);
+                        }
+                        if (comprova_dades_rebre_dades(parametres->estat_client, parametres->configuracio, socket_client, pdu) == 0) {
+                            if (pdu->tipus_paquet == SET_DATA) {
+                                int i;
+                                for (i = 0; i<sizeof (parametres->configuracio->elements) / sizeof (Element); i++) {
+                                    if (strcmp(pdu->dispositiu, parametres->configuracio->elements[i].codi) == 0) {
+                                        strcpy(parametres->configuracio->elements[i].valor, pdu->valor);
+                                        break;
+                                    }
+                                }
+                                PDU_Rebre_dades* pdu_resposta = (PDU_Rebre_dades*) malloc(sizeof (PDU_Rebre_dades));
+                                prepara_pdu_rebre_dades(pdu_resposta, DATA_ACK, parametres->configuracio->mac,
+                                        parametres->configuracio->dades_servidor.numero_aleatori, pdu->dispositiu, pdu->valor, "Canvi aplicat");
+                                if ((bytes = send(socket_client->fd_client, pdu_resposta, sizeof (PDU_Rebre_dades), 0)) == -1) {
+                                    printf("SEVERE => Error al send()\n");
+                                }
+                                if (parametres->estat_client->debug == 1) {
+                                    printf("DEBUG => Enviat { tipus paquet = %u , mac = %s , numero aleatori = %s ,"
+                                            " dispositiu = %s , valor = %s , info = %s }\n", pdu_resposta->tipus_paquet, pdu_resposta->mac,
+                                            pdu_resposta->numero_aleatori, pdu_resposta->dispositiu, pdu_resposta->valor, pdu_resposta->info);
+                                }
+                            } else if (pdu->tipus_paquet == GET_DATA) {
+                                int i;
+                                for (i = 0; i<sizeof (parametres->configuracio->elements) / sizeof (Element); i++) {
+                                    if (strcmp(pdu->dispositiu, parametres->configuracio->elements[i].codi) == 0) {
+                                        strcpy(pdu->valor, parametres->configuracio->elements[i].valor);
+                                        break;
+                                    }
+                                }
+                                PDU_Rebre_dades* pdu_resposta = (PDU_Rebre_dades*) malloc(sizeof (PDU_Rebre_dades));
+                                prepara_pdu_rebre_dades(pdu_resposta, DATA_ACK, parametres->configuracio->mac,
+                                        parametres->configuracio->dades_servidor.numero_aleatori, pdu->dispositiu, pdu->valor, "Dades enviades");
+                                if ((bytes = send(socket_client->fd_client, pdu_resposta, sizeof (PDU_Rebre_dades), 0)) == -1) {
+                                    printf("SEVERE => Error al send()\n");
+                                }
+                                if (parametres->estat_client->debug == 1) {
+                                    printf("DEBUG => Enviat { tipus paquet = %u , mac = %s , numero aleatori = %s ,"
+                                            " dispositiu = %s , valor = %s , info = %s }\n", pdu_resposta->tipus_paquet, pdu_resposta->mac,
+                                            pdu_resposta->numero_aleatori, pdu_resposta->dispositiu, pdu_resposta->valor, pdu_resposta->info);
+                                }
+                            }
+                        } else {
+                            printf("NO VALIDAT\n");
+                        }
+                    }
+                } else if (result < 0) {
+                    fprintf(stderr, "SEVERE => Error al select()\n");
                 }
-                if (parametres->estat_client->debug == 1) {
-                    printf("DEBUG => Rebut { tipus paquet = %u , mac = %s , numero aleatori = %s ,"
-                            " dispositiu = %s , valor = %s , info = %s }\n", pdu->tipus_paquet, pdu->mac, pdu->numero_aleatori, pdu->dispositiu,
-                            pdu->valor, pdu->info);
-                }
-                if (comprova_dades_rebre_dades(parametres->estat_client, parametres->configuracio, socket_client, pdu) == 0) {
-                    printf("VALIDAT\n");
-                } else {
-                    printf("NO VALIDAT\n");
-                }
+                time_out.tv_sec = 0;
             }
         } else if (result < 0) {
             fprintf(stderr, "SEVERE => Error al select()\n");
         }
-        //close(socket_client->fd_client); /* cierra fd2 */
     }
     close(socket_client->fd_server);
-    close(socket_client->fd_client); /* cierra fd2 */
+    if (socket_client->fd_client != -1) {
+        close(socket_client->fd_client); /* cierra fd2 */
+    }
     return NULL;
 }
 
@@ -175,6 +226,7 @@ int envia_dades(char* commanda, Configuracio* configuracio, Estat* estat_client)
             FD_SET(socket->fd, &read_set);
             struct timeval time_out;
             time_out.tv_sec = W;
+            time_out.tv_usec = 0;
 
             int result = select(socket->fd + 1, &read_set, NULL, NULL, &time_out);
             if (result > 0) {
@@ -221,6 +273,7 @@ int comandes(Estat* estat_client, Configuracio * configuracio) {
     FD_SET(0, &read_set);
     struct timeval time_out;
     time_out.tv_sec = 0;
+    time_out.tv_usec = 0;
     int result = 0;
 
     char commanda [100];

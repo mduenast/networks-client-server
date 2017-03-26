@@ -92,6 +92,7 @@ int mantenir_comunicacio(Estat* estat_client, Configuracio* configuracio) {
 
     struct timeval time_out;
     time_out.tv_sec = 0;
+    time_out.tv_usec = 0;
 
     signal(SIGALRM, alarm_handle);
     alarm(V);

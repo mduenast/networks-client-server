@@ -46,6 +46,7 @@ int subscripcio(Estat* estat_client, Configuracio* configuracio) {
 
     struct timeval time_out;
     time_out.tv_sec = T;
+    time_out.tv_usec = 0;
     int result = select(socket_client->fd + 1, &read_set, NULL, NULL, &time_out);
     asynchronous_read(estat_client, socket_client, configuracio, pdu, &read_set, result);
     int i, j;
