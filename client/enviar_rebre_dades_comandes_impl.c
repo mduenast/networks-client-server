@@ -104,56 +104,88 @@ void* rebre_dades(void* params) {
                         }
                         if (comprova_dades_rebre_dades(parametres->estat_client, parametres->configuracio, socket_client, pdu) == 0) {
                             if (pdu->tipus_paquet == SET_DATA) {
-                                int i;
+                                int i, existeix_dispositiu = 0;
                                 for (i = 0; i<sizeof (parametres->configuracio->elements) / sizeof (Element); i++) {
-                                    if (strcmp(pdu->dispositiu, parametres->configuracio->elements[i].codi) == 0) {
+                                    if (strcmp(pdu->dispositiu, parametres->configuracio->elements[i].codi) == 0 &&
+                                            pdu->dispositiu[6] == 'I') {
                                         strcpy(parametres->configuracio->elements[i].valor, pdu->valor);
+                                        existeix_dispositiu = 1;
                                         break;
                                     }
                                 }
-                                PDU_Rebre_dades* pdu_resposta = (PDU_Rebre_dades*) malloc(sizeof (PDU_Rebre_dades));
-                                prepara_pdu_rebre_dades(pdu_resposta, DATA_ACK, parametres->configuracio->mac,
-                                        parametres->configuracio->dades_servidor.numero_aleatori, pdu->dispositiu, pdu->valor, "Canvi aplicat");
-                                if ((bytes = send(socket_client->fd_client, pdu_resposta, sizeof (PDU_Rebre_dades), 0)) == -1) {
-                                    printf("SEVERE => Error al send()\n");
+                                if (existeix_dispositiu == 1) {
+                                    PDU_Rebre_dades* pdu_resposta = (PDU_Rebre_dades*) malloc(sizeof (PDU_Rebre_dades));
+                                    prepara_pdu_rebre_dades(pdu_resposta, DATA_ACK, parametres->configuracio->mac,
+                                            parametres->configuracio->dades_servidor.numero_aleatori, pdu->dispositiu, pdu->valor, "Canvi aplicat");
+                                    if ((bytes = send(socket_client->fd_client, pdu_resposta, sizeof (PDU_Rebre_dades), 0)) == -1) {
+                                        printf("SEVERE => Error al send()\n");
+                                    }
+                                    if (parametres->estat_client->debug == 1) {
+                                        printf("DEBUG => Enviat { tipus paquet = %u , mac = %s , numero aleatori = %s ,"
+                                                " dispositiu = %s , valor = %s , info = %s }\n", pdu_resposta->tipus_paquet, pdu_resposta->mac,
+                                                pdu_resposta->numero_aleatori, pdu_resposta->dispositiu, pdu_resposta->valor, pdu_resposta->info);
+                                    }
+                                } else {
+                                    PDU_Rebre_dades* pdu_resposta = (PDU_Rebre_dades*) malloc(sizeof (PDU_Rebre_dades));
+                                    prepara_pdu_rebre_dades(pdu_resposta, DATA_NACK, parametres->configuracio->mac,
+                                            parametres->configuracio->dades_servidor.numero_aleatori, pdu->dispositiu, pdu->valor, "Dispositiu incorrecte");
+                                    if ((bytes = send(socket_client->fd_client, pdu_resposta, sizeof (PDU_Rebre_dades), 0)) == -1) {
+                                        printf("SEVERE => Error al send()\n");
+                                    }
+                                    if (parametres->estat_client->debug == 1) {
+                                        printf("DEBUG => Enviat { tipus paquet = %u , mac = %s , numero aleatori = %s ,"
+                                                " dispositiu = %s , valor = %s , info = %s }\n", pdu_resposta->tipus_paquet, pdu_resposta->mac,
+                                                pdu_resposta->numero_aleatori, pdu_resposta->dispositiu, pdu_resposta->valor, pdu_resposta->info);
+                                    }
                                 }
-                                if (parametres->estat_client->debug == 1) {
-                                    printf("DEBUG => Enviat { tipus paquet = %u , mac = %s , numero aleatori = %s ,"
-                                            " dispositiu = %s , valor = %s , info = %s }\n", pdu_resposta->tipus_paquet, pdu_resposta->mac,
-                                            pdu_resposta->numero_aleatori, pdu_resposta->dispositiu, pdu_resposta->valor, pdu_resposta->info);
-                                }
+
                             } else if (pdu->tipus_paquet == GET_DATA) {
-                                int i;
+                                int i, existeix_dispositiu = 0;
                                 for (i = 0; i<sizeof (parametres->configuracio->elements) / sizeof (Element); i++) {
                                     if (strcmp(pdu->dispositiu, parametres->configuracio->elements[i].codi) == 0) {
                                         strcpy(pdu->valor, parametres->configuracio->elements[i].valor);
+                                        existeix_dispositiu = 1;
                                         break;
                                     }
                                 }
-                                PDU_Rebre_dades* pdu_resposta = (PDU_Rebre_dades*) malloc(sizeof (PDU_Rebre_dades));
-                                prepara_pdu_rebre_dades(pdu_resposta, DATA_ACK, parametres->configuracio->mac,
-                                        parametres->configuracio->dades_servidor.numero_aleatori, pdu->dispositiu, pdu->valor, "Dades enviades");
-                                if ((bytes = send(socket_client->fd_client, pdu_resposta, sizeof (PDU_Rebre_dades), 0)) == -1) {
-                                    printf("SEVERE => Error al send()\n");
-                                }
-                                if (parametres->estat_client->debug == 1) {
-                                    printf("DEBUG => Enviat { tipus paquet = %u , mac = %s , numero aleatori = %s ,"
-                                            " dispositiu = %s , valor = %s , info = %s }\n", pdu_resposta->tipus_paquet, pdu_resposta->mac,
-                                            pdu_resposta->numero_aleatori, pdu_resposta->dispositiu, pdu_resposta->valor, pdu_resposta->info);
+                                if (existeix_dispositiu == 1) {
+                                    PDU_Rebre_dades* pdu_resposta = (PDU_Rebre_dades*) malloc(sizeof (PDU_Rebre_dades));
+                                    prepara_pdu_rebre_dades(pdu_resposta, DATA_ACK, parametres->configuracio->mac,
+                                            parametres->configuracio->dades_servidor.numero_aleatori, pdu->dispositiu, pdu->valor, "Dades enviades");
+                                    if ((bytes = send(socket_client->fd_client, pdu_resposta, sizeof (PDU_Rebre_dades), 0)) == -1) {
+                                        printf("SEVERE => Error al send()\n");
+                                    }
+                                    if (parametres->estat_client->debug == 1) {
+                                        printf("DEBUG => Enviat { tipus paquet = %u , mac = %s , numero aleatori = %s ,"
+                                                " dispositiu = %s , valor = %s , info = %s }\n", pdu_resposta->tipus_paquet, pdu_resposta->mac,
+                                                pdu_resposta->numero_aleatori, pdu_resposta->dispositiu, pdu_resposta->valor, pdu_resposta->info);
+                                    }
+                                } else {
+                                    PDU_Rebre_dades* pdu_resposta = (PDU_Rebre_dades*) malloc(sizeof (PDU_Rebre_dades));
+                                    prepara_pdu_rebre_dades(pdu_resposta, DATA_NACK, parametres->configuracio->mac,
+                                            parametres->configuracio->dades_servidor.numero_aleatori, pdu->dispositiu, pdu->valor, "Dispositiu incorrecte");
+                                    if ((bytes = send(socket_client->fd_client, pdu_resposta, sizeof (PDU_Rebre_dades), 0)) == -1) {
+                                        printf("SEVERE => Error al send()\n");
+                                    }
+                                    if (parametres->estat_client->debug == 1) {
+                                        printf("DEBUG => Enviat { tipus paquet = %u , mac = %s , numero aleatori = %s ,"
+                                                " dispositiu = %s , valor = %s , info = %s }\n", pdu_resposta->tipus_paquet, pdu_resposta->mac,
+                                                pdu_resposta->numero_aleatori, pdu_resposta->dispositiu, pdu_resposta->valor, pdu_resposta->info);
+                                    }
                                 }
                             }
                         } else {
                             PDU_Rebre_dades* pdu_resposta = (PDU_Rebre_dades*) malloc(sizeof (PDU_Rebre_dades));
-                                prepara_pdu_rebre_dades(pdu_resposta, DATA_REJ, parametres->configuracio->mac,
-                                        parametres->configuracio->dades_servidor.numero_aleatori, pdu->dispositiu, pdu->valor, "Dades incorrectes");
-                                if ((bytes = send(socket_client->fd_client, pdu_resposta, sizeof (PDU_Rebre_dades), 0)) == -1) {
-                                    printf("SEVERE => Error al send()\n");
-                                }
-                                if (parametres->estat_client->debug == 1) {
-                                    printf("DEBUG => Enviat { tipus paquet = %u , mac = %s , numero aleatori = %s ,"
-                                            " dispositiu = %s , valor = %s , info = %s }\n", pdu_resposta->tipus_paquet, pdu_resposta->mac,
-                                            pdu_resposta->numero_aleatori, pdu_resposta->dispositiu, pdu_resposta->valor, pdu_resposta->info);
-                                }
+                            prepara_pdu_rebre_dades(pdu_resposta, DATA_REJ, parametres->configuracio->mac,
+                                    parametres->configuracio->dades_servidor.numero_aleatori, pdu->dispositiu, pdu->valor, "Dades incorrectes");
+                            if ((bytes = send(socket_client->fd_client, pdu_resposta, sizeof (PDU_Rebre_dades), 0)) == -1) {
+                                printf("SEVERE => Error al send()\n");
+                            }
+                            if (parametres->estat_client->debug == 1) {
+                                printf("DEBUG => Enviat { tipus paquet = %u , mac = %s , numero aleatori = %s ,"
+                                        " dispositiu = %s , valor = %s , info = %s }\n", pdu_resposta->tipus_paquet, pdu_resposta->mac,
+                                        pdu_resposta->numero_aleatori, pdu_resposta->dispositiu, pdu_resposta->valor, pdu_resposta->info);
+                            }
                         }
                     }
                 } else if (result < 0) {
