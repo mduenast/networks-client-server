@@ -43,7 +43,7 @@ OBJECTFILES= \
 
 
 # C Compiler Flags
-CFLAGS=-pthread -ansi -pedantic -Wall
+CFLAGS=-pthread -ansi -pedantic -Wall -D_XOPEN_SOURCE
 
 # CC Compiler Flags
 CCFLAGS=

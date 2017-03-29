@@ -47,7 +47,7 @@
       <compileType>
         <cTool>
           <standard>3</standard>
-          <commandLine>-pthread -ansi -pedantic -Wall</commandLine>
+          <commandLine>-pthread -ansi -pedantic -Wall -D_XOPEN_SOURCE</commandLine>
         </cTool>
       </compileType>
       <item path="arguments.h" ex="false" tool="3" flavor2="0">

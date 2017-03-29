@@ -51,7 +51,7 @@ void* espera_comandes(void* params) {
 
 void* rebre_dades(void* params) {
     Parametres* parametres = (Parametres*) params;
-    int sin_size;
+    unsigned int sin_size;
     Socket_client_rebre_dades* socket_client = (Socket_client_rebre_dades*)
             malloc(sizeof (Socket_client_rebre_dades));
     if (inicia_socket_tcp_rebre(parametres->configuracio, socket_client) == -1) {
@@ -431,6 +431,11 @@ int inicia_socket_tcp_rebre(Configuracio* configuracio, Socket_client_rebre_dade
         printf("SEVERE => error en socket()\n");
         return -1;
     }
+
+    int option = 1;
+
+    /* permetre reutilitzar el socket encara que estigui en TIME_WAIT */
+    setsockopt(socket_client->fd_server, SOL_SOCKET, SO_REUSEADDR, &option, sizeof (option));
 
     socket_client->server.sin_family = AF_INET;
 
