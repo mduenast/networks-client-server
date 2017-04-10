@@ -39,7 +39,7 @@ class Args_parser(object):
                     elif key == "TCP-port":
                         configuration.tcp_port = value
                     if configuration.debug:
-                        print key, value
+                        print key," : ", value
                 else:
                     break
 
@@ -53,4 +53,4 @@ class Args_parser(object):
                 controlador.mac = mac
                 configuration.controladors.append(controlador)
                 if configuration.debug:
-                    print nom , mac
+                    print nom , " : ", mac
