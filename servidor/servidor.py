@@ -1,4 +1,5 @@
 import Args_parser
+import Commandes
 import Configuration
 
 
@@ -11,6 +12,9 @@ class Servidor(object):
         configuration = Configuration.Configuration()
         args_parser = Args_parser.Args_parser()
         args_parser.parse(configuration)
+        commandes = Commandes.Commandes()
+        commandes.configuracio = configuration
+        commandes.start()
 
 
 if __name__ == "__main__":

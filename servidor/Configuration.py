@@ -4,8 +4,13 @@ class Configuration(object):
         super(Configuration, self).__init__()
         self.controladors = []
         self.debug = debug
-        self.nom = ""
-        self.mac = ""
-        self.udp_port = ""
-        self.tcp_port = ""
+        self.nom = None
+        self.mac = None
+        self.udp_port = None
+        self.tcp_port = None
+
+class Element(object):
+    def __init__(self):
+        self.dispositiu = None
+        self.valor = None
 

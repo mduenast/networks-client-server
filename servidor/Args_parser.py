@@ -1,6 +1,5 @@
 import sys
 
-import Configuration
 import Controler
 
 
@@ -11,7 +10,7 @@ class Args_parser(object):
         self.controlers_file = "controlers.dat"
 
     def parse(self, configuration):
-        for i in range(0, len(sys.argv)):
+        for i in range(len(sys.argv)):
             if sys.argv[i] == "-d":
                 configuration.debug = True
             elif sys.argv[i] == "-c":
@@ -19,7 +18,11 @@ class Args_parser(object):
             elif sys.argv[i] == "-u":
                 self.controlers_file = sys.argv[i + 1]
         self.read_configuration_file(configuration)
+        if configuration.debug:
+            print "DEBUG => ", "Llegit el fitxer de configuracio"
         self.read_controlers_file(configuration)
+        if configuration.debug:
+            print "DEBUG => ", "Llegit el fitxer de controladors"
 
     def read_configuration_file(self,configuration):
         with open(self.configuration_file,"r") as file:
@@ -35,7 +38,8 @@ class Args_parser(object):
                         configuration.udp_port = value
                     elif key == "TCP-port":
                         configuration.tcp_port = value
-                    print key, value
+                    if configuration.debug:
+                        print key, value
                 else:
                     break
 
@@ -48,4 +52,5 @@ class Args_parser(object):
                 controlador.nom = nom
                 controlador.mac = mac
                 configuration.controladors.append(controlador)
-                print nom , mac
+                if configuration.debug:
+                    print nom , mac
