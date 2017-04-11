@@ -13,7 +13,8 @@ class Commandes(Thread):
 
     def run(self):
         while not self.shutdown:
-            (read_set,write_set,exception_set) = select.select([sys.stdin],[],[])
+            (read_set, write_set, exception_set) = \
+                select.select([sys.stdin], [], [],0)
             for fd in read_set:
                 commanda = raw_input()
                 if commanda == "list":
@@ -38,12 +39,14 @@ class Commandes(Thread):
             print "* Situacio : ", controlador.situacio
             print "*********************************************"
 
-    def get(self,nom_controlador,nom_dispositiu):
+    def get(self, nom_controlador, nom_dispositiu):
         pass
 
-    def set(self,nom_controlador,nom_dispositiu,valor):
+    def set(self, nom_controlador, nom_dispositiu, valor):
         pass
 
     def quit(self):
+        for thread in self.configuracio.threads:
+            thread.shutdown = True
         print "Sortint ..."
-        exit(0)
+        sys.exit(0)

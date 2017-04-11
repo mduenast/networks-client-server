@@ -74,7 +74,7 @@ void* rebre_dades(void* params) {
         int result = select(socket_client->fd_server + 1, &read_set, NULL, NULL, &time_out);
         if (result > 0) {
             if (FD_ISSET(socket_client->fd_server, &read_set)) {
-                /* A continuación la llamada a accept() */
+                /* A continuacio la crida a accept() */
 
                 if ((socket_client->fd_client = accept(socket_client->fd_server, (struct sockaddr *) &(socket_client->client),
                         &sin_size)) == -1) {
@@ -83,7 +83,7 @@ void* rebre_dades(void* params) {
                 }
                 printf("INFO => S'ha obtingut una connexio desde => %s\n",
                         inet_ntoa((socket_client->client).sin_addr));
-                /* que mostrará la IP del cliente */
+                /* que mostrara la IP del client */
                 int bytes = 0;
                 PDU_Rebre_dades* pdu = (PDU_Rebre_dades*) malloc(sizeof (PDU_Rebre_dades));
 

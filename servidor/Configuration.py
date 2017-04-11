@@ -8,6 +8,7 @@ class Configuration(object):
         self.mac = None
         self.udp_port = None
         self.tcp_port = None
+        self.threads = []
 
 class Element(object):
     def __init__(self):
