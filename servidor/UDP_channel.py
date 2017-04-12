@@ -1,6 +1,8 @@
 import socket
 from threading import Thread
 
+import select
+
 
 class UDP_channel(Thread):
     def __init__(self):
@@ -11,12 +13,15 @@ class UDP_channel(Thread):
         self.shutdown = False
 
     def run(self):
-        self.socket_servidor = socket.socket()
+        self.socket_servidor = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
         self.socket_servidor.bind(("localhost", int(self.configuracio.udp_port)))
         if self.configuracio.debug:
             print "DEBUG => ", "Canal UDP obert"
         while not self.shutdown:
-            pass
+            (read_set, write_set, exception_set) = \
+                select.select([self.socket_servidor], [], [], 0)
+            for fd in read_set:
+                print "connexio udp", fd
         """
         s = socket.socket()
         s.bind(("localhost", 9999))

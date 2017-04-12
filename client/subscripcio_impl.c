@@ -175,7 +175,9 @@ void comprova_resposta(Estat* estat_client, Configuracio* configuracio, Socket_c
         estat_client->estat = NOT_SUBSCRIBED;
         printf("INFO => El client passa a estat NOT_SUBSCRIBED\n");
         fprintf(stderr,"SEVERE => El servidor ha rebutjat la conexio\n");
-        exit(EXIT_FAILURE);
+        subscripcio(estat_client,configuracio);
+        //exit(EXIT_FAILURE);
+        return;
     } else if (pdu->tipus_paquet == INFO_ACK && estat_client->estat == WAIT_ACK_INFO) {
         if (comprova_dades(estat_client, configuracio, socket_client, pdu) == 0) {
             configuracio->tcp_enviar_rebre_dades = atoi(pdu->dades);
@@ -185,11 +187,14 @@ void comprova_resposta(Estat* estat_client, Configuracio* configuracio, Socket_c
             estat_client->estat = NOT_SUBSCRIBED;
             printf("INFO => El client passa a estat NOT_SUBSCRIBED\n");
             fprintf(stderr,"SEVERE => Les dades no han pogut estar validades\n");
-            exit(EXIT_FAILURE);
+            subscripcio(estat_client,configuracio);
+            //exit(EXIT_FAILURE);
+            return;
         }
     } else {
         estat_client->estat = NOT_SUBSCRIBED;
         printf("INFO => El client passa a estat NOT_SUBSCRIBED\n");
+        subscripcio(estat_client,configuracio);
     }
 }
 

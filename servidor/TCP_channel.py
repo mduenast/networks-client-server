@@ -1,6 +1,8 @@
 import socket
 from threading import Thread
 
+import select
+
 
 class TCP_channel(Thread):
     def __init__(self):
@@ -11,13 +13,16 @@ class TCP_channel(Thread):
         self.shutdown = False
 
     def run(self):
-        self.socket_servidor = socket.socket()
+        self.socket_servidor = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
         self.socket_servidor.bind(("localhost", int(self.configuracio.tcp_port)))
         self.socket_servidor.listen(len(self.configuracio.controladors))
         if self.configuracio.debug:
             print "DEBUG => ", "Canal TCP obert"
         while not self.shutdown:
-            pass
+            (read_set, write_set, exception_set) = \
+                select.select([self.socket_servidor], [], [], 0)
+            for fd in read_set:
+                print  "connexio tcp",fd
         """
         s = socket.socket()
         s.bind(("localhost", 9999))

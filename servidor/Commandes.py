@@ -16,6 +16,7 @@ class Commandes(Thread):
             (read_set, write_set, exception_set) = \
                 select.select([sys.stdin], [], [],0)
             for fd in read_set:
+                print "commanda"
                 commanda = raw_input()
                 if commanda == "list":
                     self.list()
