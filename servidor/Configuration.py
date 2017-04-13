@@ -1,6 +1,9 @@
-class Configuration(object):
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# vim: set fileencoding=utf-8 :
 
-    def __init__(self,debug=False):
+class Configuration(object):
+    def __init__(self, debug=False):
         super(Configuration, self).__init__()
         self.controladors = []
         self.debug = debug
@@ -10,8 +13,8 @@ class Configuration(object):
         self.tcp_port = None
         self.threads = []
 
+
 class Element(object):
     def __init__(self):
         self.dispositiu = None
         self.valor = None
-

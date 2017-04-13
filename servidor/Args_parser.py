@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# vim: set fileencoding=utf-8 :
+
 import sys
 
 import Controler
@@ -24,12 +28,12 @@ class Args_parser(object):
         if configuration.debug:
             print "DEBUG => ", "Llegit el fitxer de controladors"
 
-    def read_configuration_file(self,configuration):
-        with open(self.configuration_file,"r") as file:
+    def read_configuration_file(self, configuration):
+        with open(self.configuration_file, "r") as file:
             for line in file:
-                if(line !='\n'):
-                    key = (line.split("=",2)[0]).strip()
-                    value = (line.split("=",2)[1]).strip()
+                if (line != '\n'):
+                    key = (line.split("=", 2)[0]).strip()
+                    value = (line.split("=", 2)[1]).strip()
                     if key == "Name":
                         configuration.nom = value
                     elif key == "MAC":
@@ -39,18 +43,17 @@ class Args_parser(object):
                     elif key == "TCP-port":
                         configuration.tcp_port = value
                     if configuration.debug:
-                        print key," : ", value
+                        print key, " : ", value
                 else:
                     break
 
-    def read_controlers_file(self,configuration):
-        with open(self.controlers_file,"r") as file:
+    def read_controlers_file(self, configuration):
+        with open(self.controlers_file, "r") as file:
             for line in file:
-                (nom,mac) = ((line.split(",",2)[0]).strip(),\
-                             (line.split(",",2)[1]).strip())
+                (nom, mac) = line.split(",", 2)
                 controlador = Controler.Controler()
-                controlador.nom = nom
-                controlador.mac = mac
+                controlador.nom = str(nom).strip()
+                controlador.mac = str(mac).strip()
                 configuration.controladors.append(controlador)
                 if configuration.debug:
-                    print nom , " : ", mac
+                    print controlador.nom , controlador.mac

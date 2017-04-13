@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# vim: set fileencoding=utf-8 :
+
 import Args_parser
 import Commandes
 import Configuration
@@ -31,6 +35,7 @@ class Servidor(object):
 
         canal_udp.join()
         canal_tcp.join()
+
 
 if __name__ == "__main__":
     servidor = Servidor()

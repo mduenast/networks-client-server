@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# vim: set fileencoding=utf-8 :
+
 import socket
 from threading import Thread
 
@@ -13,7 +17,7 @@ class TCP_channel(Thread):
         self.shutdown = False
 
     def run(self):
-        self.socket_servidor = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+        self.socket_servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket_servidor.bind(("localhost", int(self.configuracio.tcp_port)))
         self.socket_servidor.listen(len(self.configuracio.controladors))
         if self.configuracio.debug:
@@ -22,7 +26,8 @@ class TCP_channel(Thread):
             (read_set, write_set, exception_set) = \
                 select.select([self.socket_servidor], [], [], 0)
             for fd in read_set:
-                print  "connexio tcp",fd
+                if fd is self.socket_servidor:
+                    print  "connexio tcp", fd
         """
         s = socket.socket()
         s.bind(("localhost", 9999))

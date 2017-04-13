@@ -1,10 +1,13 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# vim: set fileencoding=utf-8 :
+
 class Controler(object):
     def __init__(self):
         super(Controler, self).__init__()
-        self.nom = ""
-        self.mac = ""
-        self.ip=""
-        self.random_number = ""
+        self.nom = None
+        self.mac = None
+        self.ip = None
+        self.random_number = None
         self.estat = "DISCONNECTED"
-        self.situacio = ""
-
+        self.situacio = None

@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# vim: set fileencoding=utf-8 :
+
 from threading import Thread
 
 import select
@@ -14,20 +18,20 @@ class Commandes(Thread):
     def run(self):
         while not self.shutdown:
             (read_set, write_set, exception_set) = \
-                select.select([sys.stdin], [], [],0)
+                select.select([sys.stdin], [], [], 0)
             for fd in read_set:
-                print "commanda"
-                commanda = raw_input()
-                if commanda == "list":
-                    self.list()
-                elif commanda == "get":
-                    pass
-                elif commanda == "set":
-                    pass
-                elif commanda == "quit":
-                    self.quit()
-                else:
-                    print "Comanda incorrecta"
+                if fd is sys.stdin:
+                    commanda = raw_input()
+                    if commanda == "list":
+                        self.list()
+                    elif commanda == "get":
+                        pass
+                    elif commanda == "set":
+                        pass
+                    elif commanda == "quit":
+                        self.quit()
+                    else:
+                        print "Comanda incorrecta"
 
     def list(self):
         for controlador in self.configuracio.controladors:
