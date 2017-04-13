@@ -11,3 +11,5 @@ class Controler(object):
         self.random_number = None
         self.estat = "DISCONNECTED"
         self.situacio = None
+        self.dispositius = None
+        self.tcp_transferencia_dades = None

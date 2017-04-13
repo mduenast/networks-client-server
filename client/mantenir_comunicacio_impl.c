@@ -247,11 +247,8 @@ void comprova_resposta_mantenir_comunicacio(Estat* estat_client,
                 printf("DEBUG => El client passa a estat NOT_SUBSCRIBED\n");
             }
             subscripcio(estat_client,configuracio);
-            return;
         }
     } else {
-        //exit(-1);
         subscripcio(estat_client,configuracio);
-        return;
     }
 }
