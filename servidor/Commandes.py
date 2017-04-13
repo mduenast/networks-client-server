@@ -42,6 +42,9 @@ class Commandes(Thread):
             print "* Numero aleatori : ", controlador.random_number
             print "* Estat : ", controlador.estat
             print "* Situacio : ", controlador.situacio
+            for dispositiu in controlador.dispositius:
+                print "* Dispositiu : ", dispositiu.nom_dispositiu, " , Valor : "\
+                    ,dispositiu.valor
             print "*********************************************"
 
     def get(self, nom_controlador, nom_dispositiu):

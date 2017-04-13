@@ -10,6 +10,7 @@ import select
 
 import sys
 
+from Controler import Dispositiu
 from Subscripcio import Subscripcio
 
 
@@ -118,10 +119,18 @@ class Peticio_udp(Thread):
                     and pdu.numero_aleatori == "00000000" and \
                             controlador.estat == "DISCONNECTED":
                 self.controlador = controlador
+                # afegim al controlador la seva situacio
+                self.controlador.situacio = str(pdu.dades.split(",", 2)[1])
+                # afegim al controlador la ip
+                self.controlador.ip = str(ip)
 
                 if self.parent.configuracio.debug:
                     print "DEBUG => Controlador autoritzat"
+
+                # generem un numero aleatori
                 random_number = random.randint(0, 99999999)
+                # afegim al controlador el seu numero aleatori
+                self.controlador.random_number = str(random_number)
 
                 # obrir un nou port udp per a la segona part de la subscripcio
                 self.new_socket_servidor_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -129,6 +138,7 @@ class Peticio_udp(Thread):
                 self.new_udp_port = self.new_socket_servidor_udp.getsockname()[1]
                 if self.parent.configuracio.debug:
                     print "DEBUG => Obert nou port UDP per la subscripcio"
+
                 # enviar reconeixement de la primera part de la subscripcio
                 pdu = PDU_UDP(Subscripcio.Tipus_paquets.tipus_paquets["SUBS_ACK"],
                               self.parent.configuracio.mac, random_number,
@@ -140,18 +150,37 @@ class Peticio_udp(Thread):
 
                 (read_set, write_set, exception_set) = \
                     select.select([self.new_socket_servidor_udp],
-                                  [], [],Peticio_udp.S)
+                                  [], [], Peticio_udp.S)
                 for fd in read_set:
                     if fd is self.new_socket_servidor_udp:
                         (data, (ip, port)) = self.new_socket_servidor_udp.recvfrom(103)
                         pdu = PDU_UDP.desempaquetar_pdu(data)
                         if self.parent.configuracio.debug:
                             print "DEBUG => Rebut ", pdu, "desde ", ip, ":", port
-                        if pdu.tipus_paquet == Subscripcio.Tipus_paquets.tipus_paquets["SUBS_INFO"]:
-                            if controlador.mac == pdu.mac  \
-                                    and pdu.numero_aleatori == controlador.numero_aleatori and \
+                        if pdu.tipus_paquet == str(Subscripcio.Tipus_paquets.tipus_paquets["SUBS_INFO"]):
+                            if controlador.mac == pdu.mac \
+                                    and pdu.numero_aleatori == controlador.random_number and \
                                             controlador.estat == "DISCONNECTED":
-                                print "peneee"
+                                self.controlador.tcp_transferencia_dades = str(pdu.dades.split(",", 2)[0])
+                                dispositius = (pdu.dades.split(",", 2)[1]).split(";")
+                                for dispositiu in dispositius:
+                                    d = Dispositiu(str(dispositiu))
+                                    self.controlador.dispositius.append(d)
+                                self.controlador.dispositius.pop(-1)
+                                # enviar el reconeixement del subs_info
+                                pdu = PDU_UDP(Subscripcio.Tipus_paquets.tipus_paquets["INFO_ACK"],
+                                              self.parent.configuracio.mac, random_number,
+                                              str(self.parent.configuracio.tcp_port))
+                                self.parent.socket_servidor.sendto(PDU_UDP.empaquetar_pdu(pdu),
+                                                                   (ip, int(port)))
+                                self.controlador.estat = "SUBSCRIBED"
+                                if self.parent.configuracio.debug:
+                                    print "DEBUG => El client passa a estat SUBSCRIBED"
+                                    print "DEBUG => Enviat ", pdu
+                                    print "DEBUG => Tancat socket udp per atendre la segona part de la subscripcio"
+                                self.new_socket_servidor_udp.close()
+                                break
+
                 break
             else:
                 pdu = PDU_UDP(Subscripcio.Tipus_paquets.tipus_paquets["SUBS_REJ"],
