@@ -30,7 +30,7 @@
       <file leaf-file-name="Servidor.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Servidor.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-482">
+            <state relative-caret-position="23">
               <caret line="2" column="31" lean-forward="false" selection-start-line="2" selection-start-column="31" selection-end-line="2" selection-end-column="31" />
               <folding>
                 <element signature="e#79#97#0" expanded="true" />
@@ -54,8 +54,8 @@
       <file leaf-file-name="UDP_channel.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/UDP_channel.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="484">
-              <caret line="72" column="61" lean-forward="false" selection-start-line="72" selection-start-column="61" selection-end-line="72" selection-end-column="61" />
+            <state relative-caret-position="460">
+              <caret line="77" column="33" lean-forward="false" selection-start-line="77" selection-start-column="33" selection-end-line="77" selection-end-column="33" />
               <folding>
                 <element signature="e#78#91#0" expanded="true" />
               </folding>
@@ -63,21 +63,21 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Manteniment_connexio.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Manteniment_connexio.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Manteniment_connexio.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+            <state relative-caret-position="415">
+              <caret line="21" column="0" lean-forward="false" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Subscripcio.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="Subscripcio.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Subscripcio.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="417">
-              <caret line="155" column="80" lean-forward="false" selection-start-line="155" selection-start-column="80" selection-end-line="155" selection-end-column="80" />
+            <state relative-caret-position="253">
+              <caret line="35" column="26" lean-forward="true" selection-start-line="35" selection-start-column="26" selection-end-line="35" selection-end-column="26" />
               <folding>
                 <element signature="e#78#91#0" expanded="true" />
               </folding>
@@ -98,8 +98,8 @@
       <file leaf-file-name="TCP_channel.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/TCP_channel.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="164">
-              <caret line="21" column="32" lean-forward="true" selection-start-line="21" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
+            <state relative-caret-position="414">
+              <caret line="21" column="32" lean-forward="false" selection-start-line="21" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
               <folding>
                 <element signature="e#79#92#0" expanded="true" />
               </folding>
@@ -132,7 +132,7 @@
       <file leaf-file-name="Controler.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Controler.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="369">
+            <state relative-caret-position="391">
               <caret line="17" column="0" lean-forward="false" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
               <folding />
             </state>
@@ -178,10 +178,10 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="64" />
-    <option name="y" value="-11" />
-    <option name="width" value="1297" />
-    <option name="height" value="780" />
+    <option name="x" value="65" />
+    <option name="y" value="-4" />
+    <option name="width" value="1295" />
+    <option name="height" value="772" />
   </component>
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="" version="1">
@@ -198,8 +198,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
-      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -214,6 +212,8 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scope" />
+      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -433,7 +433,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="64" y="-11" width="1297" height="780" extended-state="6" />
+    <frame x="65" y="-4" width="1295" height="772" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22779922" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -472,7 +472,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -553,7 +552,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -644,7 +642,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -725,7 +722,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -806,7 +802,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -829,7 +824,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -863,27 +857,17 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/TCP_channel.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="164">
-          <caret line="21" column="32" lean-forward="true" selection-start-line="21" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
+        <state relative-caret-position="414">
+          <caret line="21" column="32" lean-forward="false" selection-start-line="21" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
           <folding>
             <element signature="e#79#92#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Servidor.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-482">
-          <caret line="2" column="31" lean-forward="false" selection-start-line="2" selection-start-column="31" selection-end-line="2" selection-end-column="31" />
-          <folding>
-            <element signature="e#79#97#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Controler.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="369">
+        <state relative-caret-position="391">
           <caret line="17" column="0" lean-forward="false" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
           <folding />
         </state>
@@ -897,31 +881,41 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Subscripcio.py">
+    <entry file="file://$PROJECT_DIR$/UDP_channel.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="417">
-          <caret line="155" column="80" lean-forward="false" selection-start-line="155" selection-start-column="80" selection-end-line="155" selection-end-column="80" />
+        <state relative-caret-position="460">
+          <caret line="77" column="33" lean-forward="false" selection-start-line="77" selection-start-column="33" selection-end-line="77" selection-end-column="33" />
           <folding>
             <element signature="e#78#91#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/UDP_channel.py">
+    <entry file="file://$PROJECT_DIR$/Servidor.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="484">
-          <caret line="72" column="61" lean-forward="false" selection-start-line="72" selection-start-column="61" selection-end-line="72" selection-end-column="61" />
+        <state relative-caret-position="23">
+          <caret line="2" column="31" lean-forward="false" selection-start-line="2" selection-start-column="31" selection-end-line="2" selection-end-column="31" />
           <folding>
-            <element signature="e#78#91#0" expanded="true" />
+            <element signature="e#79#97#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Manteniment_connexio.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        <state relative-caret-position="415">
+          <caret line="21" column="0" lean-forward="false" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Subscripcio.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="253">
+          <caret line="35" column="26" lean-forward="true" selection-start-line="35" selection-start-column="26" selection-end-line="35" selection-end-column="26" />
+          <folding>
+            <element signature="e#78#91#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
