@@ -39,7 +39,7 @@ class UDP_channel(Thread):
                         #desempaquetar les dades
                         pdu = PDU_UDP.desempaquetar_pdu(data)
                         if self.configuracio.debug:
-                            print "DEBUG => ",pdu, " des de ",ip, ":", port
+                            print "DEBUG => Rep",pdu, " des de ",ip, ":", port
                         #comprova tipus de paquet
                         self.comprovar_tipus_paquet(pdu,(ip,port))
             """
@@ -64,18 +64,27 @@ class UDP_channel(Thread):
             print "DEBUG => ", "Canal UDP tancat"
 
     def comprovar_tipus_paquet(self,pdu,address):
+        # comprova el estat de comunicacio dels clients
+        for controlador in self.configuracio.controladors:
+            if controlador.estat == "SEND_HELLO":
+                controlador.hello_perduts += 1
+                print "Hello perdut del controlador ", controlador.nom
+            if controlador.hello_perduts == Atendre_Hello.X:
+                controlador.estat = "DISCONNECTED"
+                if self.configuracio.debug:
+                    print "DEBUG => Client passa a estat DISCONNECTED"
         if pdu.tipus_paquet == \
                 str(Subscripcio.Tipus_paquets.tipus_paquets["SUBS_REQ"]):
             if self.configuracio.debug:
                 print "DEBUG => Rebut un paquet SUBS_REQ"
             atendre_peticio_subs_req = Atendre_Subs_REQ(self,pdu,address)
-            atendre_peticio_subs_req.start()
+            atendre_peticio_subs_req.run()
         elif pdu.tipus_paquet == \
                 str(Manteniment_connexio.Tipus_paquets.tipus_paquets["HELLO"]):
             if self.configuracio.debug:
                 print "DEBUG => Rebut un paquet HELLO"
             atendre_hello = Atendre_Hello(self,pdu,address)
-            atendre_hello.start()
+            atendre_hello.run()
 
 class PDU_UDP(object):
     def __init__(self, tipus_paquet=None, mac=None, numero_aleatori=None, dades=None):
