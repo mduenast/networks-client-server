@@ -28,7 +28,6 @@ class Atendre_Hello(Thread):
         if self.parent.configuracio.debug:
             print "DEBUG => Atenent peticio HELLO amb un Thread:", self.getName()
         for controlador in self.parent.configuracio.controladors:
-            print "----",controlador.situacio,len(controlador.situacio),len(self.pdu.dades.split(",", 2)[1].strip())
             if (controlador.estat == "SUBSCRIBED" \
                         or controlador.estat == "SEND_HELLO") and \
                             controlador.mac == self.pdu.mac \
@@ -47,7 +46,7 @@ class Atendre_Hello(Thread):
                                       numero_aleatori=controlador_temp.random_number,
                                       dades=str(controlador_temp.nom + "," + controlador_temp.situacio))
             packed_data = UDP_channel.PDU_UDP.empaquetar_pdu(pdu)
-            controlador_temp.estat == "SEND_HELLO"
+            controlador_temp.estat = "SEND_HELLO"
             self.parent.socket_servidor.sendto(packed_data, self.address)
             if self.parent.configuracio.debug:
                 print "DEBUG => Enviat", pdu, " des de ", self.address

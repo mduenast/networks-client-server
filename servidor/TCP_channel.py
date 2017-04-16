@@ -30,7 +30,12 @@ class TCP_channel(Thread):
             if len(read_set):
                 for fd in read_set:
                     if fd is self.socket_servidor:
-                        pass
+                        (client_socket, address) = self.socket_servidor.accept()
+                        self.socket_client = client_socket
+                        data = self.socket_client.recv(118)
+                        pdu = PDU_TCP.desempaquetar_pdu(data)
+                        if self.configuracio.debug:
+                            print "--DEBUG => Rep ", pdu, " des de ", address
         """
         s = socket.socket()
         s.bind(("localhost", 9999))
@@ -51,6 +56,9 @@ class TCP_channel(Thread):
             self.socket_client.close()
         if self.configuracio.debug:
             print "DEBUG => ", "Canal TCP tancat"
+
+    def comprova_tipus_paquet(self, pdu, address):
+        pass
 
 
 class PDU_TCP(object):
@@ -83,3 +91,11 @@ class PDU_TCP(object):
                                   str(pdu.dispositiu), str(pdu.valor),
                                   str(pdu.info))
         return packed_data
+
+    def __str__(self):
+        return "{0} , {1} , {2} , {3} , {4} , {5}".format(str(self.tipus_paquet),
+                                                          str(self.mac),
+                                                          str(self.numero_aleatori),
+                                                          str(self.dispositiu),
+                                                          str(self.valor),
+                                                          str(self.info))
