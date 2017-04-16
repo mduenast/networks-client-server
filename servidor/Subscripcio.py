@@ -43,11 +43,10 @@ class Atendre_Subs_REQ(Thread):
                     and controlador.mac == str(self.pdu.mac) and \
                             self.pdu.numero_aleatori == "00000000":
                 if controlador.estat != "DISCONNECTED":
-                    print "A tomar por el culo la subscripcion "
                     return 0
                 if len(self.pdu.dades.split(",", 2)[0]) > 0 \
                         and len(self.pdu.dades.split(",", 2)[1]) > 0:
-                    controlador.situacio = str(self.pdu.dades.split(",", 2)[1])
+                    controlador.situacio = (str(self.pdu.dades.split(",", 2)[1]))[:12]
                     if self.parent.configuracio.debug:
                         print "DEBUG => Controlador autoritzat"
                     autoritzat = True

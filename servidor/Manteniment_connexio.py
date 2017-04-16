@@ -28,17 +28,18 @@ class Atendre_Hello(Thread):
         if self.parent.configuracio.debug:
             print "DEBUG => Atenent peticio HELLO amb un Thread:", self.getName()
         for controlador in self.parent.configuracio.controladors:
+            print "----",controlador.situacio,len(controlador.situacio),len(self.pdu.dades.split(",", 2)[1].strip())
             if (controlador.estat == "SUBSCRIBED" \
                         or controlador.estat == "SEND_HELLO") and \
                             controlador.mac == self.pdu.mac \
-                    and self.pdu.numero_aleatori == controlador.random_number:# \
-                    #and self.pdu.dades.split(",", 2)[0].strip() == controlador.nom \
-                    #and self.pdu.dades.split(",", 2)[1].strip() == controlador.situacio:
+                    and self.pdu.numero_aleatori == controlador.random_number \
+                    and (self.pdu.dades.split(",", 2)[0].strip())[:8] == controlador.nom \
+                    and (self.pdu.dades.split(",", 2)[1].strip())[:12] == controlador.situacio:
                 autenticat = True
                 controlador_temp = controlador
                 break
 
-        if not autenticat:
+        if autenticat:
             if self.parent.configuracio.debug:
                 print "DEBUG => Client autenticat"
             pdu = UDP_channel.PDU_UDP(tipus_paquet=Manteniment_connexio.Tipus_paquets.tipus_paquets["HELLO"],
