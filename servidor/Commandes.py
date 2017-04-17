@@ -24,10 +24,10 @@ class Commandes(Thread):
                     commanda = raw_input()
                     if commanda == "list":
                         self.list()
-                    elif commanda == "get":
-                        pass
-                    elif commanda == "set":
-                        pass
+                    elif "get" in commanda:
+                        print "get"
+                    elif "set" in commanda:
+                        print "set"
                     elif commanda == "quit":
                         self.quit()
                     else:
@@ -43,8 +43,7 @@ class Commandes(Thread):
             print "* Estat : ", controlador.estat
             print "* Situacio : ", controlador.situacio
             for dispositiu in controlador.dispositius:
-                print "* Dispositiu : ", dispositiu.nom_dispositiu, " , Valor : "\
-                    ,dispositiu.valor
+                print "* Dispositiu : ", str(dispositiu)
             print "*********************************************"
 
     def get(self, nom_controlador, nom_dispositiu):

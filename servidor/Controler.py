@@ -28,10 +28,3 @@ class Controler(object):
         self.dispositius = []
         self.tcp_transferencia_dades = None
         self.hello_perduts = 0
-
-
-class Dispositiu(object):
-    def __init__(self, nom_dispositiu="", valor=0):
-        super(Dispositiu, self).__init__()
-        self.nom_dispositiu = nom_dispositiu
-        self.valor = valor

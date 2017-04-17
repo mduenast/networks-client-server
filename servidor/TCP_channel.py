@@ -9,6 +9,8 @@ import select
 
 import struct
 
+from Espera_connexions import Espera_connexions, Atendre_espera_connexions
+
 
 class TCP_channel(Thread):
     def __init__(self):
@@ -35,7 +37,8 @@ class TCP_channel(Thread):
                         data = self.socket_client.recv(118)
                         pdu = PDU_TCP.desempaquetar_pdu(data)
                         if self.configuracio.debug:
-                            print "--DEBUG => Rep ", pdu, " des de ", address
+                            print "DEBUG => Rep ", pdu, " des de ", address
+                        self.comprova_tipus_paquet(pdu, address, client_socket)
         """
         s = socket.socket()
         s.bind(("localhost", 9999))
@@ -57,8 +60,17 @@ class TCP_channel(Thread):
         if self.configuracio.debug:
             print "DEBUG => ", "Canal TCP tancat"
 
-    def comprova_tipus_paquet(self, pdu, address):
-        pass
+    def comprova_tipus_paquet(self, pdu, address, socket_client):
+        if pdu.tipus_paquet == \
+                str(Espera_connexions.Tipus_paquets.tipus_paquets["SEND_DATA"]):
+            if self.configuracio.debug:
+                print "DEBUG => Rebut paquet SEND_DATA"
+            atendre_espera_connexions = \
+                Atendre_espera_connexions(parent=self, pdu=pdu, address=address, socket_client=socket_client)
+            atendre_espera_connexions.parent = self
+            atendre_espera_connexions.start()
+        else:
+            pass
 
 
 class PDU_TCP(object):
@@ -86,7 +98,8 @@ class PDU_TCP(object):
 
     @staticmethod
     def empaquetar_pdu(pdu):
-        packed_data = struct.pack("B13s9s8s7s80s", str(pdu.tipus_paquet),
+        packed_data = struct.pack("B13s9s8s7s80s",
+                                  pdu.tipus_paquet,
                                   str(pdu.mac), str(pdu.numero_aleatori),
                                   str(pdu.dispositiu), str(pdu.valor),
                                   str(pdu.info))

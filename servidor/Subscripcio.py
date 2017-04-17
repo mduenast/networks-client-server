@@ -7,9 +7,7 @@ from threading import Thread
 
 import select
 
-import copy
-
-from Controler import Controler, Dispositiu
+from Controler import Controler
 import UDP_channel
 
 
@@ -113,8 +111,7 @@ class Atendre_Subs_REQ(Thread):
                                 # capturem els dispositius
                                 dispositius = (pdu.dades.split(",", 2)[1]).split(";")
                                 for i in range(len(dispositius) - 1):
-                                    d = Dispositiu(nom_dispositiu=str(dispositius[i]))
-                                    controlador_temp.dispositius.append(d)
+                                    controlador_temp.dispositius.append(str(dispositius[i]))
                                 if self.parent.configuracio.debug:
                                     print "DEBUG => Dades comprovades"
                                 # enviament de reconeixement del SUBS_INFO -> INFO_ACK

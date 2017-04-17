@@ -11,7 +11,6 @@ import select
 import sys
 
 from Manteniment_connexio import Manteniment_connexio, Atendre_Hello
-from Controler import Dispositiu
 from Subscripcio import Subscripcio, Atendre_Subs_REQ
 
 
@@ -69,13 +68,13 @@ class UDP_channel(Thread):
             if self.configuracio.debug:
                 print "DEBUG => Rebut un paquet SUBS_REQ"
             atendre_peticio_subs_req = Atendre_Subs_REQ(self, pdu, address)
-            atendre_peticio_subs_req.run()
+            atendre_peticio_subs_req.start()
         elif pdu.tipus_paquet == \
                 str(Manteniment_connexio.Tipus_paquets.tipus_paquets["HELLO"]):
             if self.configuracio.debug:
                 print "DEBUG => Rebut un paquet HELLO"
             atendre_hello = Atendre_Hello(self, pdu, address)
-            atendre_hello.run()
+            atendre_hello.start()
 
 
 class PDU_UDP(object):
