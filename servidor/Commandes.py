@@ -103,16 +103,14 @@ class Commandes(Thread):
                           valor=str(valor),
                           info="set")
             packed_data = PDU_TCP.empaquetar_pdu(pdu)
+            print controlador_temp.tcp_transferencia_dades
             socket_client = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-            socket_client.bind(('localhost',0))
-            socket_client.listen(2)
             socket_client.connect((controlador_temp.ip,
                                    int(controlador_temp.tcp_transferencia_dades)))
             socket_client.send(packed_data)
-
-            socket_client.close()
             if self.configuracio.debug:
                 print "DEBUG => Envia ",pdu, "des de ",socket_client.getsockname()
+            socket_client.close()
         else:
             print "No existeix"
 
