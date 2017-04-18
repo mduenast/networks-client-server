@@ -10,7 +10,7 @@ import select
 
 import sys
 
-from Manteniment_connexio import Manteniment_connexio, Atendre_Hello
+from Manteniment_connexio import Manteniment_connexio, Atendre_Hello, Comprovar_hello_perduts
 from Subscripcio import Subscripcio, Atendre_Subs_REQ
 
 
@@ -23,6 +23,9 @@ class UDP_channel(Thread):
         self.shutdown = False
 
     def run(self):
+        comprova_hello_perduts = Comprovar_hello_perduts(parent=self)
+        comprova_hello_perduts.start()
+
         self.socket_servidor = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.socket_servidor.bind(('', int(self.configuracio.udp_port)))
         if self.configuracio.debug:
@@ -56,6 +59,7 @@ class UDP_channel(Thread):
             sc.close()
             s.close()
             """
+        comprova_hello_perduts.join()
         self.socket_servidor.close()
         if self.socket_client != None:
             self.socket_client.close()

@@ -2,7 +2,10 @@ from threading import Thread
 
 import copy
 
+import time
+
 import UDP_channel
+from Configuration import Configuration
 from Controler import Controler
 
 
@@ -12,8 +15,6 @@ class Manteniment_connexio(object):
 
 
 class Atendre_Hello(Thread):
-    V = 2
-    X = 4
 
     def __init__(self, parent=None, pdu=None, address=None):
         super(Atendre_Hello, self).__init__()
@@ -39,6 +40,7 @@ class Atendre_Hello(Thread):
                 break
 
         if autenticat:
+            controlador_temp.hello_perduts = 0
             if self.parent.configuracio.debug:
                 print "DEBUG => Client autenticat"
             pdu = UDP_channel.PDU_UDP(tipus_paquet=Manteniment_connexio.Tipus_paquets.tipus_paquets["HELLO"],
@@ -64,3 +66,23 @@ class Atendre_Hello(Thread):
                                       dades="Dades incorrectes")
             packed_data = UDP_channel.PDU_UDP.empaquetar_pdu(pdu)
             self.parent.socket_servidor.sendto(packed_data, self.address)
+
+
+class Comprovar_hello_perduts(Thread):
+    V = 2
+    X = 4
+    def __init__(self,parent=None):
+        super(Comprovar_hello_perduts, self).__init__()
+        self.parent = parent
+    def run(self):
+        while not self.parent.shutdown:
+            for controlador in self.parent.configuracio.controladors:
+                if controlador.estat == "SEND_HELLO":
+                    time.sleep(Comprovar_hello_perduts.V)
+                    controlador.hello_perduts += 1
+                    if (controlador.hello_perduts % Comprovar_hello_perduts.X) \
+                        == 0:
+                        controlador.estat == "DISCONNECTED"
+                        controlador.reset_controler()
+                        if self.parent.configuracio.debug:
+                            print "DEBUG => El client passa a estat DISCONNECTED"

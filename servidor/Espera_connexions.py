@@ -81,7 +81,7 @@ class Atendre_espera_connexions(Thread):
             if self.parent.configuracio.debug:
                 print "DEBUG => Enviat ", pdu, " a ", self.address
         else:
-            if self.parent.configurario.debug:
+            if self.parent.configuracio.debug:
                 print "DEBUG => Client no autenticat"
                 # enviar DATA_REJ
                 pdu = TCP_channel.PDU_TCP(tipus_paquet= \
