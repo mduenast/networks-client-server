@@ -59,7 +59,6 @@ class UDP_channel(Thread):
             sc.close()
             s.close()
             """
-        comprova_hello_perduts.join()
         self.socket_servidor.close()
         if self.socket_client != None:
             self.socket_client.close()

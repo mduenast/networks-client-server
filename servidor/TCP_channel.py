@@ -9,7 +9,7 @@ import select
 
 import struct
 
-from Espera_connexions import Espera_connexions, Atendre_espera_connexions
+from Espera_connexions import *
 
 
 class TCP_channel(Thread):
