@@ -56,4 +56,4 @@ class Args_parser(object):
                 controlador.mac = str(mac).strip()
                 configuration.controladors.append(controlador)
                 if configuration.debug:
-                    print controlador.nom , controlador.mac
+                    print controlador.nom, controlador.mac

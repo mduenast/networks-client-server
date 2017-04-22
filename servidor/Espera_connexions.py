@@ -46,7 +46,7 @@ class Atendre_espera_connexions(Thread):
                 fitxer.write("{0}-{1}-{2}".format(dt.day, dt.month, dt.year) \
                              + ";{0}-{1}-{2}".format(dt.hour, dt.minute, dt.second) \
                              + ";SEND_DATA" \
-                             + ";" +  self.pdu.dispositiu \
+                             + ";" + self.pdu.dispositiu \
                              + ";" + self.pdu.valor + "\n")
             except Exception as ex:
                 if self.parent.configuracio.debug:

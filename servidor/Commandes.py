@@ -14,6 +14,7 @@ from TCP_channel import PDU_TCP
 
 class Commandes(Thread):
     W = 3
+
     def __init__(self):
         super(Commandes, self).__init__()
         self.shutdown = False
@@ -30,27 +31,27 @@ class Commandes(Thread):
                         self.list()
                     elif "get" in commanda:
                         try:
-                            nom_controlador = commanda.split(" ",3)[1]
-                            nom_dispositiu = commanda.split(" ",3)[2]
+                            nom_controlador = commanda.split(" ", 3)[1]
+                            nom_dispositiu = commanda.split(" ", 3)[2]
                             if len(nom_controlador) > 0 and len(nom_dispositiu) > 0:
-                                self.get(nom_controlador,nom_dispositiu)
+                                self.get(nom_controlador, nom_dispositiu)
                             else:
                                 print "Comanda incorrecta"
                         except Exception as ex:
                             print "Comanda incorrecta"
-                            print "SEVERE => ",ex
+                            print "SEVERE => ", ex
                     elif "set" in commanda:
                         try:
                             nom_controlador = (commanda.split(" ", 4))[1]
                             nom_dispositiu = (commanda.split(" ", 4))[2]
                             valor = (commanda.split(" ", 4))[3]
                             if len(nom_controlador) > 0 and len(nom_dispositiu) > 0:
-                                self.set(nom_controlador, nom_dispositiu,valor)
+                                self.set(nom_controlador, nom_dispositiu, valor)
                             else:
                                 print "Comanda incorrecta"
                         except Exception as ex:
                             print "Comanda incorrecta"
-                            print "SEVERE => ",ex
+                            print "SEVERE => ", ex
                     elif commanda == "quit":
                         self.quit()
                     else:
@@ -94,7 +95,7 @@ class Commandes(Thread):
                 break
         if existeix:
             print "Existeix"
-            pdu = PDU_TCP(tipus_paquet=Espera_connexions.\
+            pdu = PDU_TCP(tipus_paquet=Espera_connexions. \
                           Tipus_paquets.tipus_paquets["SET_DATA"],
                           mac=str(self.configuracio.mac),
                           numero_aleatori=str(controlador_temp.random_number),
@@ -103,30 +104,33 @@ class Commandes(Thread):
                           info="set")
             packed_data = PDU_TCP.empaquetar_pdu(pdu)
             print controlador_temp.tcp_transferencia_dades
-            socket_client = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+            socket_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             socket_client.connect((controlador_temp.ip,
                                    int(controlador_temp.tcp_transferencia_dades)))
             socket_client.send(packed_data)
             if self.configuracio.debug:
-                print "DEBUG => Envia ",pdu, "des de ",socket_client.getsockname()
+                print "DEBUG => Envia ", pdu, "des de ", socket_client.getsockname()
             # espera la resposta del client
-            (read_set,write_set,exception_set) =\
-                select.select([socket_client],[],[],Commandes.W)
-            if len(read_set)> 0:
+            (read_set, write_set, exception_set) = \
+                select.select([socket_client], [], [], Commandes.W)
+            if len(read_set) > 0:
                 for fd in read_set:
                     if fd is socket_client:
                         data = socket_client.recv(118)
                         pdu = PDU_TCP.desempaquetar_pdu(data)
                         if self.configuracio.debug:
-                            print "DEBUG => Rebut", pdu, "des de ",socket_client.getsockname()
+                            print "DEBUG => Rebut", pdu, "des de ", socket_client.getsockname()
                         # comprovacio del paquet de resposta
+                        # paquet data_ack rebut
                         if pdu.tipus_paquet == \
-                            str(Espera_connexions.Tipus_paquets.tipus_paquets["DATA_ACK"]):
+                                str(Espera_connexions.Tipus_paquets.tipus_paquets["DATA_ACK"]):
+                            # validacio de les dades
                             if pdu.mac == controlador_temp.mac \
                                     and pdu.numero_aleatori == controlador_temp.random_number \
-                                and pdu.dispositiu == nom_dispositiu \
+                                    and pdu.dispositiu == nom_dispositiu \
                                     and pdu.valor.rstrip(' \t\r\n\0') == valor:
-                                self.emmagatzemar_dades(controlador_temp,pdu)
+                                # emmagatzemem els canvis
+                                self.emmagatzemar_dades(controlador_temp, pdu)
                                 if self.configuracio:
                                     print "DEBUG => Dades acceptades"
                             else:
@@ -134,18 +138,19 @@ class Commandes(Thread):
                                 if self.configuracio.debug:
                                     print "DEBUG => Dades incorrectes"
                                     print "DEBUG => Client passa a estat DISCONNECTED"
+                        # paquet data_nack rebut
                         elif pdu.tipus_paquet == \
-                            str(Espera_connexions.Tipus_paquets.tipus_paquets["DATA_NACK"]):
+                                str(Espera_connexions.Tipus_paquets.tipus_paquets["DATA_NACK"]):
                             if self.configuracio.debug:
                                 print "DEBUG => La operacio ha fallat"
+                        # paquet data_rej rebut
                         elif pdu.tipus_paquet == \
-                            str(Espera_connexions.Tipus_paquets.tipus_paquets["DATA_REJ"]):
+                                str(Espera_connexions.Tipus_paquets.tipus_paquets["DATA_REJ"]):
                             controlador_temp.estat = "DISCONNECTED"
                             if self.configuracio.debug:
                                 print "DEBUG => La operacio ha fallat"
                                 print "DEBUG => Client passa a estat DISCONNECTED"
-
-
+            # perdua de la connexio
             else:
                 controlador_temp.estat = "DISCONNECTED"
                 if self.configuracio.debug:
@@ -160,7 +165,7 @@ class Commandes(Thread):
         print "Sortint ..."
         sys.exit(0)
 
-    def emmagatzemar_dades(self,controlador,pdu):
+    def emmagatzemar_dades(self, controlador, pdu):
         # emmagatzamar les dades
         fitxer = None
         try:

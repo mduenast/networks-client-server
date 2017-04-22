@@ -15,7 +15,6 @@ class Manteniment_connexio(object):
 
 
 class Atendre_Hello(Thread):
-
     def __init__(self, parent=None, pdu=None, address=None):
         super(Atendre_Hello, self).__init__()
         self.parent = parent
@@ -71,9 +70,11 @@ class Atendre_Hello(Thread):
 class Comprovar_hello_perduts(Thread):
     V = 2
     X = 4
-    def __init__(self,parent=None):
+
+    def __init__(self, parent=None):
         super(Comprovar_hello_perduts, self).__init__()
         self.parent = parent
+
     def run(self):
         while not self.parent.shutdown:
             for controlador in self.parent.configuracio.controladors:
@@ -81,7 +82,7 @@ class Comprovar_hello_perduts(Thread):
                     time.sleep(Comprovar_hello_perduts.V)
                     controlador.hello_perduts += 1
                     if (controlador.hello_perduts % Comprovar_hello_perduts.X) \
-                        == 0:
+                            == 0:
                         controlador.estat == "DISCONNECTED"
                         controlador.reset_controler()
                         if self.parent.configuracio.debug:
