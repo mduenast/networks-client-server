@@ -126,6 +126,7 @@ class Commandes(Thread):
                                     and pdu.numero_aleatori == controlador_temp.random_number \
                                 and pdu.dispositiu == nom_dispositiu \
                                     and pdu.valor.rstrip(' \t\r\n\0') == valor:
+                                self.emmagatzemar_dades(controlador_temp,pdu)
                                 if self.configuracio:
                                     print "DEBUG => Dades acceptades"
                             else:
@@ -158,3 +159,22 @@ class Commandes(Thread):
             thread.shutdown = True
         print "Sortint ..."
         sys.exit(0)
+
+    def emmagatzemar_dades(self,controlador,pdu):
+        # emmagatzamar les dades
+        fitxer = None
+        try:
+            fitxer = open("{0}-{1}.data".format(controlador.nom, controlador.situacio),
+                          "a+")
+            dt = datetime.datetime.now()
+            fitxer.write("{0}-{1}-{2}".format(dt.day, dt.month, dt.year) \
+                         + ";{0}-{1}-{2}".format(dt.hour, dt.minute, dt.second) \
+                         + ";SEND_DATA" \
+                         + ";" + pdu.dispositiu \
+                         + ";" + pdu.valor + "\n")
+        except Exception as ex:
+            if self.parent.configuracio.debug:
+                print "SEVERE => ", ex
+        finally:
+            if fitxer:
+                fitxer.close()

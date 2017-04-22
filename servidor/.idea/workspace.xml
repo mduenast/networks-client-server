@@ -52,21 +52,31 @@
       <file leaf-file-name="Manteniment_connexio.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Manteniment_connexio.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1702">
+            <state relative-caret-position="425">
               <caret line="82" column="51" lean-forward="false" selection-start-line="82" selection-start-column="51" selection-end-line="82" selection-end-column="51" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Commandes.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Commandes.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Commandes.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1988">
-              <caret line="46" column="0" lean-forward="false" selection-start-line="46" selection-start-column="0" selection-end-line="46" selection-end-column="0" />
+            <state relative-caret-position="105">
+              <caret line="128" column="76" lean-forward="false" selection-start-line="128" selection-start-column="76" selection-end-line="128" selection-end-column="76" />
               <folding>
                 <element signature="e#78#91#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CTRL-000-B01F00R03Z01.data" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/CTRL-000-B01F00R03Z01.data">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="42" lean-forward="false" selection-start-line="0" selection-start-column="42" selection-end-line="0" selection-end-column="42" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -94,8 +104,8 @@
       <file leaf-file-name="Espera_connexions.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Espera_connexions.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="713">
-              <caret line="36" column="10" lean-forward="false" selection-start-line="36" selection-start-column="10" selection-end-line="36" selection-end-column="10" />
+            <state relative-caret-position="345">
+              <caret line="68" column="34" lean-forward="true" selection-start-line="67" selection-start-column="16" selection-end-line="68" selection-end-column="34" />
               <folding />
             </state>
           </provider>
@@ -150,11 +160,11 @@
         <option value="$PROJECT_DIR$/Controler.py" />
         <option value="$PROJECT_DIR$/Subscripcio.py" />
         <option value="$PROJECT_DIR$/Espera_connexions.py" />
-        <option value="$PROJECT_DIR$/CTRL-000-B01F00R03Z01.data" />
         <option value="$PROJECT_DIR$/Manteniment_connexio.py" />
         <option value="$PROJECT_DIR$/UDP_channel.py" />
         <option value="$PROJECT_DIR$/TCP_channel.py" />
         <option value="$PROJECT_DIR$/Commandes.py" />
+        <option value="$PROJECT_DIR$/CTRL-000-B01F00R03Z01.data" />
       </list>
     </option>
   </component>
@@ -748,25 +758,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/CTRL-000-B01F00R03Z01.data">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="115">
-          <caret line="5" column="42" lean-forward="false" selection-start-line="5" selection-start-column="42" selection-end-line="5" selection-end-column="42" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Args_parser.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="289">
           <caret line="55" column="49" lean-forward="false" selection-start-line="55" selection-start-column="49" selection-end-line="55" selection-end-column="49" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Manteniment_connexio.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1702">
-          <caret line="82" column="51" lean-forward="false" selection-start-line="82" selection-start-column="51" selection-end-line="82" selection-end-column="51" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -804,14 +799,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Espera_connexions.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="713">
-          <caret line="36" column="10" lean-forward="false" selection-start-line="36" selection-start-column="10" selection-end-line="36" selection-end-column="10" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/TCP_channel.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="348">
@@ -830,13 +817,37 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Manteniment_connexio.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="425">
+          <caret line="82" column="51" lean-forward="false" selection-start-line="82" selection-start-column="51" selection-end-line="82" selection-end-column="51" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Espera_connexions.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="345">
+          <caret line="68" column="34" lean-forward="true" selection-start-line="67" selection-start-column="16" selection-end-line="68" selection-end-column="34" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Commandes.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1988">
-          <caret line="46" column="0" lean-forward="false" selection-start-line="46" selection-start-column="0" selection-end-line="46" selection-end-column="0" />
+        <state relative-caret-position="105">
+          <caret line="128" column="76" lean-forward="false" selection-start-line="128" selection-start-column="76" selection-end-line="128" selection-end-column="76" />
           <folding>
             <element signature="e#78#91#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CTRL-000-B01F00R03Z01.data">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="42" lean-forward="false" selection-start-line="0" selection-start-column="42" selection-end-line="0" selection-end-column="42" />
+          <folding />
         </state>
       </provider>
     </entry>
