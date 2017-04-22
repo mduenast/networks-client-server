@@ -8,7 +8,7 @@ import select
 
 import sys
 
-import Espera_connexions
+from Espera_connexions import *
 from TCP_channel import PDU_TCP
 
 
@@ -44,7 +44,6 @@ class Commandes(Thread):
                             nom_controlador = (commanda.split(" ", 4))[1]
                             nom_dispositiu = (commanda.split(" ", 4))[2]
                             valor = (commanda.split(" ", 4))[3]
-                            print valor, type(valor)
                             if len(nom_controlador) > 0 and len(nom_dispositiu) > 0:
                                 self.set(nom_controlador, nom_dispositiu,valor)
                             else:
@@ -95,7 +94,7 @@ class Commandes(Thread):
                 break
         if existeix:
             print "Existeix"
-            pdu = PDU_TCP(tipus_paquet=Espera_connexions.Espera_connexions.\
+            pdu = PDU_TCP(tipus_paquet=Espera_connexions.\
                           Tipus_paquets.tipus_paquets["SET_DATA"],
                           mac=str(self.configuracio.mac),
                           numero_aleatori=str(controlador_temp.random_number),
@@ -110,6 +109,46 @@ class Commandes(Thread):
             socket_client.send(packed_data)
             if self.configuracio.debug:
                 print "DEBUG => Envia ",pdu, "des de ",socket_client.getsockname()
+            # espera la resposta del client
+            (read_set,write_set,exception_set) =\
+                select.select([socket_client],[],[],Commandes.W)
+            if len(read_set)> 0:
+                for fd in read_set:
+                    if fd is socket_client:
+                        data = socket_client.recv(118)
+                        pdu = PDU_TCP.desempaquetar_pdu(data)
+                        if self.configuracio.debug:
+                            print "DEBUG => Rebut", pdu, "des de ",socket_client.getsockname()
+                        # comprovacio del paquet de resposta
+                        if pdu.tipus_paquet == \
+                            str(Espera_connexions.Tipus_paquets.tipus_paquets["DATA_ACK"]):
+                            if pdu.mac == controlador_temp.mac \
+                                    and pdu.numero_aleatori == controlador_temp.random_number \
+                                and pdu.dispositiu == nom_dispositiu \
+                                    and pdu.valor.rstrip(' \t\r\n\0') == valor:
+                                if self.configuracio:
+                                    print "DEBUG => Dades acceptades"
+                            else:
+                                controlador_temp.estat = "DISCONNECTED"
+                                if self.configuracio.debug:
+                                    print "DEBUG => Dades incorrectes"
+                                    print "DEBUG => Client passa a estat DISCONNECTED"
+                        elif pdu.tipus_paquet == \
+                            str(Espera_connexions.Tipus_paquets.tipus_paquets["DATA_NACK"]):
+                            if self.configuracio.debug:
+                                print "DEBUG => La operacio ha fallat"
+                        elif pdu.tipus_paquet == \
+                            str(Espera_connexions.Tipus_paquets.tipus_paquets["DATA_REJ"]):
+                            controlador_temp.estat = "DISCONNECTED"
+                            if self.configuracio.debug:
+                                print "DEBUG => La operacio ha fallat"
+                                print "DEBUG => Client passa a estat DISCONNECTED"
+
+
+            else:
+                controlador_temp.estat = "DISCONNECTED"
+                if self.configuracio.debug:
+                    print "DEBUG => Client passa a estat DISCONNECTED"
             socket_client.close()
         else:
             print "No existeix"
