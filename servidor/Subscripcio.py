@@ -45,8 +45,10 @@ class Atendre_Subs_REQ(Thread):
                 if len(self.pdu.dades.split(",", 2)[0]) > 0 \
                         and len(self.pdu.dades.split(",", 2)[1]) > 0:
                     controlador.situacio = (str(self.pdu.dades.split(",", 2)[1]))[:12]
+                    controlador.estat = "WAIT_INFO"
                     if self.parent.configuracio.debug:
                         print "DEBUG => Controlador autoritzat"
+                        print "DEBUG => Client passa a estat WAIT_INFO"
                     autoritzat = True
                     controlador.ip = str(self.address[0])
                     controlador_temp = controlador
@@ -64,7 +66,7 @@ class Atendre_Subs_REQ(Thread):
 
         # Si el controlador esta autoritzat i
         # en un estat legal es prepara la seguent fase
-        if controlador_temp.estat == "DISCONNECTED" and autoritzat:
+        if controlador_temp.estat == "WAIT_INFO" and autoritzat:
             # generar un numero aleatori per al controlador
             controlador_temp.random_number = str(random.randint(0, 99999999))
 
