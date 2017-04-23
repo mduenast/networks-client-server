@@ -9,7 +9,7 @@ import select
 
 import struct
 
-from Espera_connexions import *
+import Espera_connexions
 
 
 class TCP_channel(Thread):
@@ -62,11 +62,12 @@ class TCP_channel(Thread):
 
     def comprova_tipus_paquet(self, pdu, address, socket_client):
         if pdu.tipus_paquet == \
-                str(Espera_connexions.Tipus_paquets.tipus_paquets["SEND_DATA"]):
+                str(Espera_connexions.Espera_connexions.Tipus_paquets.tipus_paquets["SEND_DATA"]):
             if self.configuracio.debug:
                 print "DEBUG => Rebut paquet SEND_DATA"
             atendre_espera_connexions = \
-                Atendre_espera_connexions(parent=self, pdu=pdu, address=address, socket_client=socket_client)
+                Espera_connexions.Atendre_espera_connexions(parent=self, pdu=pdu, address=address,
+                                                            socket_client=socket_client)
             atendre_espera_connexions.parent = self
             atendre_espera_connexions.start()
         else:

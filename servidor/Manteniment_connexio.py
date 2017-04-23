@@ -52,13 +52,13 @@ class Atendre_Hello(Thread):
             if self.parent.configuracio.debug:
                 print "DEBUG => Enviat", pdu, " des de ", self.address
                 if controlador_temp.estat == "SUBSCRIBED":
-                    print "DEBUG => El client passa a estat SEND_HELLO"
+                    print "DEBUG => El client passa a estat SEND_HELLO", controlador_temp.nom
         else:
             controlador_temp.estat = "DISCONNECTED"
             controlador_temp.reset_controler()
             if self.parent.configuracio.debug:
                 print "DEBUG => Client no autenticat"
-                print "DEBUG => Client passa a estat DISCONNECTED"
+                print "DEBUG => Client passa a estat DISCONNECTED", controlador_temp.nom
             pdu = UDP_channel.PDU_UDP(tipus_paquet=Manteniment_connexio.Tipus_paquets.tipus_paquets["HELLO_REJ"],
                                       mac=self.parent.configuracio.mac,
                                       numero_aleatori="00000000",
@@ -78,7 +78,8 @@ class Comprovar_hello_perduts(Thread):
     def run(self):
         while not self.parent.shutdown:
             for controlador in self.parent.configuracio.controladors:
-                if controlador.estat == "SEND_HELLO":
+                if controlador.estat == "SEND_HELLO" or \
+                                controlador.estat == "SUBSCRIBED":
                     time.sleep(Comprovar_hello_perduts.V)
                     controlador.hello_perduts += 1
                     if (controlador.hello_perduts % Comprovar_hello_perduts.X) \
@@ -86,4 +87,4 @@ class Comprovar_hello_perduts(Thread):
                         controlador.estat == "DISCONNECTED"
                         controlador.reset_controler()
                         if self.parent.configuracio.debug:
-                            print "DEBUG => El client passa a estat DISCONNECTED"
+                            print "DEBUG => El client passa a estat DISCONNECTED", controlador.nom

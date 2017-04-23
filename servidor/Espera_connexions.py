@@ -1,6 +1,6 @@
 from threading import Thread
 
-from django.db.models.functions import datetime
+import datetime
 
 import TCP_channel
 from Controler import Controler

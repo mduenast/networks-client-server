@@ -40,7 +40,8 @@ class Atendre_Subs_REQ(Thread):
             if controlador.nom == str(self.pdu.dades.split(",", 2)[0]) \
                     and controlador.mac == str(self.pdu.mac) and \
                             self.pdu.numero_aleatori == "00000000":
-                if controlador.estat != "DISCONNECTED":
+                if controlador.estat == "SUBSCRIBED" or \
+                                controlador.estat == "SEND_HELLO":
                     return 0
                 if len(self.pdu.dades.split(",", 2)[0]) > 0 \
                         and len(self.pdu.dades.split(",", 2)[1]) > 0:
@@ -48,7 +49,7 @@ class Atendre_Subs_REQ(Thread):
                     controlador.estat = "WAIT_INFO"
                     if self.parent.configuracio.debug:
                         print "DEBUG => Controlador autoritzat"
-                        print "DEBUG => Client passa a estat WAIT_INFO"
+                        print "DEBUG => Client passa a estat WAIT_INFO", controlador.nom
                     autoritzat = True
                     controlador.ip = str(self.address[0])
                     controlador_temp = controlador
@@ -106,7 +107,9 @@ class Atendre_Subs_REQ(Thread):
                                 print "DEBUG => S'ha rebut un SUBS_INFO"
                             # comprovar les dades del paquet SUBS_INFO
                             if controlador_temp.mac == str(pdu.mac) and \
-                                            controlador_temp.random_number == pdu.numero_aleatori:
+                                            controlador_temp.random_number == \
+                                            pdu.numero_aleatori and len(pdu.dades.split(",", 2)[0]) > 0 and \
+                                    len(pdu.dades.split(",", 2)[1]):
                                 # capturem el port tcp del controlador
                                 controlador_temp.tcp_transferencia_dades = \
                                     str(pdu.dades.split(",", 2)[0])
@@ -127,26 +130,26 @@ class Atendre_Subs_REQ(Thread):
                                 controlador_temp.estat = "SUBSCRIBED"
                                 if self.parent.configuracio.debug:
                                     print "DEBUG => Envia ", pdu, "des de ", self.address_second_socket_udp
-                                    print "DEBUG => El client passa a estat SUBSCRIBED"
-                        else:
-                            # envia un SUBS_REJ
-                            pdu = UDP_channel.PDU_UDP(tipus_paquet= \
-                                                          Subscripcio.Tipus_paquets.tipus_paquets["SUBS_REJ"],
-                                                      mac=self.parent.configuracio.mac,
-                                                      numero_aleatori="00000000",
-                                                      dades="Dades incorrectes")
-                            packed_data = UDP_channel.PDU_UDP.empaquetar_pdu(pdu)
-                            self.new_socket_udp.sendto(packed_data, self.address_second_socket_udp)
-                            # passa a estat desconectat i torna a començar un nou proces de subscripcio
-                            controlador_temp.estat = "DISCONNECTED"
-                            controlador_temp.reset_controler()
-                            if self.parent.configuracio.debug:
-                                print "DEBUG => El client passa a estat DISCONNECTED"
+                                    print "DEBUG => El client passa a estat SUBSCRIBED", controlador_temp.nom
+                            else:
+                                # envia un SUBS_REJ
+                                pdu = UDP_channel.PDU_UDP(tipus_paquet= \
+                                                              Subscripcio.Tipus_paquets.tipus_paquets["SUBS_REJ"],
+                                                          mac=self.parent.configuracio.mac,
+                                                          numero_aleatori="00000000",
+                                                          dades="Dades incorrectes")
+                                packed_data = UDP_channel.PDU_UDP.empaquetar_pdu(pdu)
+                                self.new_socket_udp.sendto(packed_data, self.address_second_socket_udp)
+                                # passa a estat desconectat i torna a començar un nou proces de subscripcio
+                                controlador_temp.estat = "DISCONNECTED"
+                                controlador_temp.reset_controler()
+                                if self.parent.configuracio.debug:
+                                    print "DEBUG => El client passa a estat DISCONNECTED", controlador_temp.nom
             else:
                 controlador_temp.estat = "DISCONNECTED"
                 controlador_temp.reset_controler()
                 if self.parent.configuracio.debug:
-                    print "DEBUG => El client passa a estat DISCONNECTED"
+                    print "DEBUG => El client passa a estat DISCONNECTED", controlador_temp.nom
             # tancar el segon socket udp
             # finalitzada la fase de subscripcio del controlador
             self.new_socket_udp.close()

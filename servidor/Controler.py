@@ -17,7 +17,6 @@ class Controler(object):
         self.dispositius = []
         self.tcp_transferencia_dades = None
         self.hello_perduts = 0
-        self.lock = threading.RLock()
 
     def reset_controler(self):
         self.ip = ""

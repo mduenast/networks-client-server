@@ -80,7 +80,6 @@ class Commandes(Thread):
                 controlador_temp = controlador
                 break
         if existeix:
-            print "Existeix"
             pdu = PDU_TCP(tipus_paquet=Espera_connexions. \
                           Tipus_paquets.tipus_paquets["GET_DATA"],
                           mac=str(self.configuracio.mac),
@@ -122,7 +121,7 @@ class Commandes(Thread):
                                 controlador_temp.estat = "DISCONNECTED"
                                 if self.configuracio.debug:
                                     print "DEBUG => Dades incorrectes"
-                                    print "DEBUG => Client passa a estat DISCONNECTED"
+                                    print "DEBUG => Client passa a estat DISCONNECTED", controlador_temp.nom
                         # paquet data_nack rebut
                         elif pdu.tipus_paquet == \
                                 str(Espera_connexions.Tipus_paquets.tipus_paquets["DATA_NACK"]):
@@ -134,12 +133,12 @@ class Commandes(Thread):
                             controlador_temp.estat = "DISCONNECTED"
                             if self.configuracio.debug:
                                 print "DEBUG => La operacio ha fallat"
-                                print "DEBUG => Client passa a estat DISCONNECTED"
+                                print "DEBUG => Client passa a estat DISCONNECTED", controlador_temp.nom
             # perdua de la connexio
             else:
                 controlador_temp.estat = "DISCONNECTED"
                 if self.configuracio.debug:
-                    print "DEBUG => Client passa a estat DISCONNECTED"
+                    print "DEBUG => Client passa a estat DISCONNECTED", controlador_temp.nom
             socket_client.close()
         else:
             print "No existeix"
@@ -154,7 +153,6 @@ class Commandes(Thread):
                 controlador_temp = controlador
                 break
         if existeix:
-            print "Existeix"
             pdu = PDU_TCP(tipus_paquet=Espera_connexions. \
                           Tipus_paquets.tipus_paquets["SET_DATA"],
                           mac=str(self.configuracio.mac),
@@ -197,7 +195,7 @@ class Commandes(Thread):
                                 controlador_temp.estat = "DISCONNECTED"
                                 if self.configuracio.debug:
                                     print "DEBUG => Dades incorrectes"
-                                    print "DEBUG => Client passa a estat DISCONNECTED"
+                                    print "DEBUG => Client passa a estat DISCONNECTED", controlador_temp.nom
                         # paquet data_nack rebut
                         elif pdu.tipus_paquet == \
                                 str(Espera_connexions.Tipus_paquets.tipus_paquets["DATA_NACK"]):
@@ -209,12 +207,12 @@ class Commandes(Thread):
                             controlador_temp.estat = "DISCONNECTED"
                             if self.configuracio.debug:
                                 print "DEBUG => La operacio ha fallat"
-                                print "DEBUG => Client passa a estat DISCONNECTED"
+                                print "DEBUG => Client passa a estat DISCONNECTED", controlador_temp.nom
             # perdua de la connexio
             else:
                 controlador_temp.estat = "DISCONNECTED"
                 if self.configuracio.debug:
-                    print "DEBUG => Client passa a estat DISCONNECTED"
+                    print "DEBUG => Client passa a estat DISCONNECTED", controlador_temp.nom
             socket_client.close()
         else:
             print "No existeix"
@@ -240,6 +238,9 @@ class Commandes(Thread):
         except Exception as ex:
             if self.parent.configuracio.debug:
                 print "SEVERE => ", ex
+                controlador.estat = "DISCONNECTED"
+                if self.configuracio.debug:
+                    print "DEBUG => Client passa a estat DISCONNECTED", controlador.nom
         finally:
             if fitxer:
                 fitxer.close()
